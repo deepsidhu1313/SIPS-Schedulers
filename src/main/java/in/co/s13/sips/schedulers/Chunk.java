@@ -20,6 +20,7 @@ import in.co.s13.sips.lib.ParallelForSENP;
 import in.co.s13.sips.lib.TaskNodePair;
 import in.co.s13.sips.lib.common.datastructure.LiveNode;
 import in.co.s13.sips.lib.common.datastructure.Node;
+import in.co.s13.sips.lib.common.datastructure.ParallelForLoop;
 import in.co.s13.sips.scheduler.Scheduler;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,10 +33,12 @@ public class Chunk implements Scheduler {
     }
 
     @Override
-    public ArrayList<ParallelForSENP> scheduleParallelFor(ArrayList<Node> nodes, Object start, Object end, boolean reverseLoop, int dataType) {
+    public ArrayList<ParallelForSENP> scheduleParallelFor(ArrayList<Node> nodes,ParallelForLoop loop) {
         ArrayList<ParallelForSENP> result = new ArrayList<>();
         System.out.println("Before Sorting:" + nodes);
-        Collections.sort(nodes, LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.thenComparing(LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT));
+        
+        // first sort score in decending order, then distance in ascending order
+        Collections.sort(nodes, LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.reversed().thenComparing(LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT));
         System.out.println("After Sorting:" + nodes);
         return result;
     }
