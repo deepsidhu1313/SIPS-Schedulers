@@ -24,6 +24,7 @@ import in.co.s13.sips.lib.common.datastructure.ParallelForLoop;
 import in.co.s13.sips.scheduler.Scheduler;
 import java.util.ArrayList;
 import java.util.Collections;
+import org.json.JSONObject;
 
 public class Chunk implements Scheduler {
 
@@ -33,13 +34,242 @@ public class Chunk implements Scheduler {
     }
 
     @Override
-    public ArrayList<ParallelForSENP> scheduleParallelFor(ArrayList<Node> nodes,ParallelForLoop loop) {
+    public ArrayList<ParallelForSENP> scheduleParallelFor(ArrayList<Node> nodes, ParallelForLoop loop, JSONObject schedulerSettings) {
         ArrayList<ParallelForSENP> result = new ArrayList<>();
         System.out.println("Before Sorting:" + nodes);
-        
+
         // first sort score in decending order, then distance in ascending order
         Collections.sort(nodes, LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.reversed().thenComparing(LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT));
         System.out.println("After Sorting:" + nodes);
+        int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
+        if (maxNodes < nodes.size()) {
+            // select best nodes for scheduling
+            nodes = new ArrayList<>(nodes.subList(0, maxNodes));
+        }
+        String chunksize, lower, upper;
+        boolean reverseloop = loop.isReverse();
+        byte min_byte = 0, max_byte = 0, diff_byte = 0, low_byte, up_byte;
+        short min_short = 0, max_short = 0, diff_short = 0, low_short, up_short;
+        int min_int = 0, max_int = 0, diff_int = 0, low_int, up_int;
+        long min_long = 0, max_long = 0, diff_long = 0, low_long, up_long;
+        float min_float = 0, max_float = 0, diff_float = 0, low_float, up_float;
+        double min_double = 0, max_double = 0, diff_double = 0, low_double, up_double;
+
+        switch (loop.getDataType()) {
+            case 0:
+                min_byte = (byte) loop.getInit();
+                max_byte = (byte) loop.getLimit();
+                diff_byte = (byte) loop.getDiff();
+                break;
+            case 1:
+                min_short = (short) loop.getInit();
+                max_short = (short) loop.getLimit();
+                diff_short = (short) loop.getDiff();
+                break;
+            case 2:
+                min_int = (int) loop.getInit();
+                max_int = (int) loop.getLimit();
+                diff_int = (int) loop.getDiff();
+                break;
+            case 3:
+                min_long = (long) loop.getInit();
+                max_long = (long) loop.getLimit();
+                diff_long = (long) loop.getDiff();
+                break;
+            case 4:
+                min_float = (float) loop.getInit();
+                max_float = (float) loop.getLimit();
+                diff_float = (float) loop.getDiff();
+                break;
+            case 5:
+                min_double = (double) loop.getInit();
+                max_double = (double) loop.getLimit();
+                diff_double = (double) loop.getDiff();
+                break;
+        }
+        int totalnodes = nodes.size();
+
+        for (int i = 1; i <= nodes.size(); i++) {
+            Node get = nodes.get(i - 1);
+            switch (loop.getDataType()) {
+                case 0:
+                    chunksize = "" + diff_byte / totalnodes;
+                    if (i == 1) {
+                        low_byte = (byte) (((diff_byte / totalnodes) * (i - 1)));
+                    } else {
+                        low_byte = (byte) (((diff_byte / totalnodes) * (i - 1)) + 1);
+                    }
+
+                    up_byte = (byte) ((diff_byte / totalnodes) * (i));
+                    if (reverseloop) {
+                        lower = "" + (min_byte - low_byte);
+                        if (i == totalnodes) {
+                            upper = "" + ((max_byte - (min_byte - up_byte)) + (min_byte - up_byte));
+                        } else {
+                            upper = "" + (min_byte - up_byte);
+                        }
+
+                    } else {
+                        lower = "" + (min_byte + low_byte);
+                        if (i == totalnodes) {
+                            upper = "" + ((max_byte - (min_byte + up_byte)) + (min_byte + up_byte));
+                        } else {
+
+                            upper = "" + (min_byte + up_byte);
+                        }
+
+                    }
+                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                    break;
+                case 1:
+                    chunksize = "" + diff_short / totalnodes;
+                    if (i == 1) {
+                        low_short = (short) (((diff_short / totalnodes) * (i - 1)));
+                    } else {
+                        low_short = (short) (((diff_short / totalnodes) * (i - 1)) + 1);
+                    }
+                    up_short = (short) ((diff_short / totalnodes) * (i));
+                    if (reverseloop) {
+                        lower = "" + (min_short - low_short);
+                        if (i == totalnodes) {
+                            upper = "" + ((max_short - (min_short - up_short)) + (min_short - up_short));
+                        } else {
+
+                            upper = "" + (min_short - up_short);
+                        }
+
+                    } else {
+                        lower = "" + (min_short + low_short);
+                        if (i == totalnodes) {
+                            upper = "" + ((max_short - (min_short + up_short)) + (min_short + up_short));
+                        } else {
+
+                            upper = "" + (min_short + up_short);
+                        }
+
+                    }
+                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                    break;
+                case 2:
+                    chunksize = "" + diff_int / totalnodes;
+                    if (i == 1) {
+                        low_int = (((diff_int / totalnodes) * (i - 1)));
+                    } else {
+                        low_int = (((diff_int / totalnodes) * (i - 1)) + 1);
+                    }
+                    up_int = ((diff_int / totalnodes) * (i));
+                    if (reverseloop) {
+                        lower = "" + (min_int - low_int);
+                        if (i == totalnodes) {
+                            upper = "" + ((max_int - (min_int - up_int)) + (min_int - up_int));
+                        } else {
+
+                            upper = "" + (min_int - up_int);
+                        }
+
+                    } else {
+                        lower = "" + (min_int + low_int);
+                        if (i == totalnodes) {
+                            upper = "" + ((max_int - (min_int + up_int)) + (min_int + up_int));
+                        } else {
+
+                            upper = "" + (min_int + up_int);
+                        }
+
+                    }
+                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                    break;
+                case 3:
+
+                    chunksize = "" + diff_long / totalnodes;
+                    if (i == 1) {
+                        low_long = (((diff_long / totalnodes) * (i - 1)));
+                    } else {
+                        low_long = (((diff_long / totalnodes) * (i - 1)) + 1);
+                    }
+                    up_long = ((diff_long / totalnodes) * (i));
+                    if (reverseloop) {
+                        lower = "" + (min_long - low_long);
+                        if (i == totalnodes) {
+                            upper = "" + ((max_long - (min_long - up_long)) + (min_long - up_long));
+                        } else {
+
+                            upper = "" + (min_long - up_long);
+                        }
+
+                    } else {
+                        lower = "" + (min_long + low_long);
+                        if (i == totalnodes) {
+                            upper = "" + ((max_long - (min_long + up_long)) + (min_long + up_long));
+                        } else {
+
+                            upper = "" + (min_long + up_long);
+                        }
+                    }
+                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                    break;
+                case 4:
+                    chunksize = "" + diff_float / totalnodes;
+                    if (i == 1) {
+                        low_float = (((diff_float / totalnodes) * (i - 1)));
+                    } else {
+                        low_float = (((diff_float / totalnodes) * (i - 1)) + 1);
+                    }
+                    up_float = ((diff_float / totalnodes) * (i));
+                    if (reverseloop) {
+                        lower = "" + (min_float - low_float);
+                        if (i == totalnodes) {
+                            upper = "" + ((max_float - (min_float - up_float)) + (min_float - up_float));
+                        } else {
+
+                            upper = "" + (min_float - up_float);
+                        }
+                    } else {
+                        lower = "" + (min_float + low_float);
+                        if (i == totalnodes) {
+                            upper = "" + ((max_float - (min_float + up_float)) + (min_float + up_float));
+                        } else {
+
+                            upper = "" + (min_float + up_float);
+                        }
+
+                    }
+                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                    break;
+                case 5:
+                    chunksize = "" + diff_double / totalnodes;
+                    if (i == 1) {
+                        low_double = (((diff_double / totalnodes) * (i - 1)));
+                    } else {
+                        low_double = (((diff_double / totalnodes) * (i - 1)) + 1);
+                    }
+                    up_double = ((diff_double / totalnodes) * (i));
+                    if (reverseloop) {
+                        lower = "" + (min_double - low_double);
+
+                        if (i == totalnodes) {
+                            upper = "" + ((max_double - (min_double - up_double)) + (min_double - up_double));
+                        } else {
+
+                            upper = "" + (min_double - up_double);
+                        }
+                    } else {
+                        lower = "" + (min_double + low_double);
+                        if (i == totalnodes) {
+                            upper = "" + ((max_double - (min_double + up_double)) + (min_double + up_double));
+                        } else {
+
+                            upper = "" + (min_double + up_double);
+                        }
+
+                    }
+                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                    break;
+
+            }
+
+        }
+
         return result;
     }
 
