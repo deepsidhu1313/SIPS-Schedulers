@@ -39,7 +39,7 @@ public class Chunk implements Scheduler {
         System.out.println("Before Sorting:" + nodes);
 
         // first sort score in decending order, then distance in ascending order
-        Collections.sort(nodes, LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.reversed().thenComparing(LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT));
+        Collections.sort(nodes, LiveNode.LiveNodeComparator.QWAIT.thenComparing(LiveNode.LiveNodeComparator.QLEN.reversed()).thenComparing(LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.reversed()).thenComparing(LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT));
         System.out.println("After Sorting:" + nodes);
         int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
         if (maxNodes < nodes.size()) {
