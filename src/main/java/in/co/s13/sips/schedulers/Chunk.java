@@ -24,6 +24,7 @@ import in.co.s13.sips.lib.common.datastructure.ParallelForLoop;
 import in.co.s13.sips.scheduler.Scheduler;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONObject;
 
 public class Chunk implements Scheduler {
@@ -34,10 +35,12 @@ public class Chunk implements Scheduler {
     }
 
     @Override
-    public ArrayList<ParallelForSENP> scheduleParallelFor(ArrayList<Node> nodes, ParallelForLoop loop, JSONObject schedulerSettings) {
+    public ArrayList<ParallelForSENP> scheduleParallelFor(ConcurrentHashMap<String,Node> livenodes, ParallelForLoop loop, JSONObject schedulerSettings) {
         ArrayList<ParallelForSENP> result = new ArrayList<>();
+        ArrayList<Node> nodes= new ArrayList<>();
+        nodes.addAll(livenodes.values());
+        
         System.out.println("Before Sorting:" + nodes);
-
         // first sort score in decending order, then distance in ascending order
         Collections.sort(nodes, LiveNode.LiveNodeComparator.QWAIT.thenComparing(LiveNode.LiveNodeComparator.QLEN.reversed()).thenComparing(LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.reversed()).thenComparing(LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT));
         System.out.println("After Sorting:" + nodes);

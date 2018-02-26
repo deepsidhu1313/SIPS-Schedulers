@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONObject;
 
 /**
@@ -40,8 +41,10 @@ public class GA implements Scheduler {
     }
 
     @Override
-    public ArrayList<ParallelForSENP> scheduleParallelFor(ArrayList<Node> nodes, ParallelForLoop loop, JSONObject schedulerSettings) {
+    public ArrayList<ParallelForSENP> scheduleParallelFor(ConcurrentHashMap<String, Node> liveNodes, ParallelForLoop loop, JSONObject schedulerSettings) {
         ArrayList<ParallelForSENP> result = new ArrayList<>();
+        ArrayList<Node> nodes = new ArrayList<>();
+        nodes.addAll(liveNodes.values());
         System.out.println("Before Sorting:" + nodes);
 
         /**
@@ -181,7 +184,7 @@ public class GA implements Scheduler {
                             if (j == 0) {
                                 up_byte--;
                             }
-                            if (up_byte < max_byte) {
+                            if (up_byte < max_byte || j == availSlots - 1) {
                                 up_byte = max_byte;
                                 j = availSlots;
                             }
@@ -195,7 +198,7 @@ public class GA implements Scheduler {
                             if (j == 0) {
                                 up_byte++;
                             }
-                            if (up_byte > max_byte) {
+                            if (up_byte > max_byte || j == availSlots - 1) {
                                 up_byte = max_byte;
                                 j = availSlots;
                             }
@@ -218,7 +221,7 @@ public class GA implements Scheduler {
                             if (j == 0) {
                                 up_short--;
                             }
-                            if (up_short < max_short) {
+                            if (up_short < max_short || j == availSlots - 1) {
                                 up_short = max_short;
                                 j = availSlots;
                             }
@@ -232,7 +235,7 @@ public class GA implements Scheduler {
                             if (j == 0) {
                                 up_short++;
                             }
-                            if (up_short > max_short) {
+                            if (up_short > max_short || j == availSlots - 1) {
                                 up_short = max_short;
                                 j = availSlots;
                             }
@@ -254,7 +257,7 @@ public class GA implements Scheduler {
                             if (j == 0) {
                                 up_int--;
                             }
-                            if (up_int < max_int) {
+                            if (up_int < max_int || j == availSlots - 1) {
                                 up_int = max_int;
                                 j = availSlots;
                             }
@@ -268,7 +271,7 @@ public class GA implements Scheduler {
                             if (j == 0) {
                                 up_int++;
                             }
-                            if (up_int > max_int) {
+                            if (up_int > max_int || j == availSlots - 1) {
                                 up_int = max_int;
                                 j = availSlots;
                             }
@@ -290,7 +293,7 @@ public class GA implements Scheduler {
                             if (j == 0) {
                                 up_long--;
                             }
-                            if (up_long < max_long) {
+                            if (up_long < max_long || j == availSlots - 1) {
                                 up_long = max_long;
                                 j = availSlots;
                             }
@@ -304,7 +307,7 @@ public class GA implements Scheduler {
                             if (j == 0) {
                                 up_long++;
                             }
-                            if (up_long > max_long) {
+                            if (up_long > max_long || j == availSlots - 1) {
                                 up_long = max_long;
                                 j = availSlots;
                             }
@@ -326,7 +329,7 @@ public class GA implements Scheduler {
                             if (j == 0) {
                                 up_float--;
                             }
-                            if (up_float < max_float) {
+                            if (up_float < max_float || j == availSlots - 1) {
                                 up_float = max_float;
                                 j = availSlots;
                             }
@@ -340,7 +343,7 @@ public class GA implements Scheduler {
                             if (j == 0) {
                                 up_float++;
                             }
-                            if (up_float > max_float) {
+                            if (up_float > max_float || j == availSlots - 1) {
                                 up_float = max_float;
                                 j = availSlots;
                             }
@@ -362,7 +365,7 @@ public class GA implements Scheduler {
                             if (j == 0) {
                                 up_double--;
                             }
-                            if (up_double < max_double) {
+                            if (up_double < max_double || j == availSlots - 1) {
                                 up_double = max_double;
                                 j = availSlots;
                             }
@@ -376,7 +379,7 @@ public class GA implements Scheduler {
                             if (j == 0) {
                                 up_double++;
                             }
-                            if (up_double > max_double) {
+                            if (up_double > max_double || j == availSlots - 1) {
                                 up_double = max_double;
                                 j = availSlots;
                             }
