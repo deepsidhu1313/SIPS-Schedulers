@@ -121,10 +121,10 @@ public class Factoring implements Scheduler {
                         }
 
                         lower = "" + (low_byte);
-                        up_byte = (byte) (low_byte - cs_byte + 1);
+                        up_byte = (byte) (low_byte - cs_byte );
                         upper = "" + (up_byte);
 
-                        if (lupper_byte <= max_byte || i == totalnodes) {
+                        if (lupper_byte <= max_byte) {
                             upper = "" + (max_byte);
                             chunksCreated = true;
                         }
@@ -143,18 +143,19 @@ public class Factoring implements Scheduler {
                         }
                         lower = "" + (low_byte);
 
-                        up_byte = (byte) (low_byte + cs_byte - 1);
+                        up_byte = (byte) (low_byte + cs_byte);
                         upper = "" + (up_byte);
-                        if (up_byte >= max_byte || i == totalnodes) {
+                        if (up_byte >= max_byte) {
                             upper = "" + (max_byte);
                             chunksCreated = true;
                         }
                         lupper_byte = up_byte;
-                        if (i % totalnodes == 0) {
-                            diff_byte = (byte) (diff_byte - (cs_byte * totalnodes));
-                        }
+
                     }
-                    result.add(new ParallelForSENP(lower, upper, ""));
+                    if (i % totalnodes == 0) {
+                        diff_byte = (byte) (diff_byte - (cs_byte * totalnodes));
+                    }
+                    result.add(new ParallelForSENP(lower, upper,"",chunksize));
                     break;
                 case 1:
                     cs_short = (short) Math.ceil((double) diff_short / (double) (2 * totalnodes));
@@ -173,10 +174,10 @@ public class Factoring implements Scheduler {
                         }
 
                         lower = "" + (low_short);
-                        up_short = (short) (low_short - cs_short + 1);
+                        up_short = (short) (low_short - cs_short );
                         upper = "" + (up_short);
 
-                        if (lupper_short <= max_short || i == totalnodes) {
+                        if (lupper_short <= max_short) {
                             upper = "" + (max_short);
                             chunksCreated = true;
                         }
@@ -195,18 +196,19 @@ public class Factoring implements Scheduler {
                         }
                         lower = "" + (low_short);
 
-                        up_short = (short) (low_short + cs_short - 1);
+                        up_short = (short) (low_short + cs_short );
                         upper = "" + (up_short);
-                        if (up_short >= max_short || i == totalnodes) {
+                        if (up_short >= max_short) {
                             upper = "" + (max_short);
                             chunksCreated = true;
                         }
                         lupper_short = up_short;
-                        if (i % totalnodes == 0) {
-                            diff_short = (short) (diff_short - (cs_short * totalnodes));
-                        }
+
                     }
-                    result.add(new ParallelForSENP(lower, upper, ""));
+                    if (i % totalnodes == 0) {
+                        diff_short = (short) (diff_short - (cs_short * totalnodes));
+                    }
+                    result.add(new ParallelForSENP(lower, upper,"",chunksize));
                     break;
                 case 2:
                     cs_int = (int) Math.ceil((double) diff_int / (double) (2 * totalnodes));
@@ -225,10 +227,10 @@ public class Factoring implements Scheduler {
                         }
 
                         lower = "" + (low_int);
-                        up_int = (int) (low_int - cs_int + 1);
+                        up_int = (int) (low_int - cs_int );
                         upper = "" + (up_int);
 
-                        if (lupper_int <= max_int || i == totalnodes) {
+                        if (lupper_int <= max_int) {
                             upper = "" + (max_int);
                             chunksCreated = true;
                         }
@@ -247,18 +249,19 @@ public class Factoring implements Scheduler {
                         }
                         lower = "" + (low_int);
 
-                        up_int = (int) (low_int + cs_int - 1);
+                        up_int = (int) (low_int + cs_int );
                         upper = "" + (up_int);
-                        if (up_int >= max_int || i == totalnodes) {
+                        if (up_int >= max_int) {
                             upper = "" + (max_int);
                             chunksCreated = true;
                         }
                         lupper_int = up_int;
-                        if (i % totalnodes == 0) {
-                            diff_int = (int) (diff_int - (cs_int * totalnodes));
-                        }
+
                     }
-                    result.add(new ParallelForSENP(lower, upper, ""));
+                    if (i % totalnodes == 0) {
+                        diff_int = (int) (diff_int - (cs_int * totalnodes));
+                    }
+                    result.add(new ParallelForSENP(lower, upper,"",chunksize));
                     break;
                 case 3:
                     cs_long = (long) Math.ceil((double) diff_long / ((double) 2 * totalnodes));
@@ -277,10 +280,10 @@ public class Factoring implements Scheduler {
                         }
 
                         lower = "" + (low_long);
-                        up_long = (long) (low_long - cs_long + 1);
+                        up_long = (long) (low_long - cs_long );
                         upper = "" + (up_long);
 
-                        if (lupper_long <= max_long || i == totalnodes) {
+                        if (lupper_long <= max_long) {
                             upper = "" + (max_long);
                             chunksCreated = true;
                         }
@@ -299,18 +302,19 @@ public class Factoring implements Scheduler {
                         }
                         lower = "" + (low_long);
 
-                        up_long = (long) (low_long + cs_long - 1);
+                        up_long = (long) (low_long + cs_long );
                         upper = "" + (up_long);
-                        if (up_long >= max_long || i == totalnodes) {
+                        if (up_long >= max_long) {
                             upper = "" + (max_long);
                             chunksCreated = true;
                         }
                         lupper_long = up_long;
-                        if (i % totalnodes == 0) {
-                            diff_long = (long) (diff_long - (cs_long * totalnodes));
-                        }
+
                     }
-                    result.add(new ParallelForSENP(lower, upper, ""));
+                    if (i % totalnodes == 0) {
+                        diff_long = (long) (diff_long - (cs_long * totalnodes));
+                    }
+                    result.add(new ParallelForSENP(lower, upper,"",chunksize));
                     break;
                 case 4:
                     cs_float = (float) Math.ceil((double) diff_float / (double) (2 * totalnodes));
@@ -329,10 +333,10 @@ public class Factoring implements Scheduler {
                         }
 
                         lower = "" + (low_float);
-                        up_float = (float) (low_float - cs_float + 1);
+                        up_float = (float) (low_float - cs_float );
                         upper = "" + (up_float);
 
-                        if (lupper_float <= max_float || i == totalnodes) {
+                        if (lupper_float <= max_float) {
                             upper = "" + (max_float);
                             chunksCreated = true;
                         }
@@ -351,18 +355,19 @@ public class Factoring implements Scheduler {
                         }
                         lower = "" + (low_float);
 
-                        up_float = (float) (low_float + cs_float - 1);
+                        up_float = (float) (low_float + cs_float );
                         upper = "" + (up_float);
-                        if (up_float >= max_float || i == totalnodes) {
+                        if (up_float >= max_float) {
                             upper = "" + (max_float);
                             chunksCreated = true;
                         }
                         lupper_float = up_float;
-                        if (i % totalnodes == 0) {
-                            diff_float = (float) (diff_float - (cs_float * totalnodes));
-                        }
+
                     }
-                    result.add(new ParallelForSENP(lower, upper, ""));
+                    if (i % totalnodes == 0) {
+                        diff_float = (float) (diff_float - (cs_float * totalnodes));
+                    }
+                    result.add(new ParallelForSENP(lower, upper,"",chunksize));
                     break;
                 case 5:
                     cs_double = (double) Math.ceil((double) diff_double / (double) (2 * totalnodes));
@@ -381,10 +386,10 @@ public class Factoring implements Scheduler {
                         }
 
                         lower = "" + (low_double);
-                        up_double = (double) (low_double - cs_double + 1);
+                        up_double = (double) (low_double - cs_double );
                         upper = "" + (up_double);
 
-                        if (lupper_double <= max_double || i == totalnodes) {
+                        if (lupper_double <= max_double) {
                             upper = "" + (max_double);
                             chunksCreated = true;
                         }
@@ -403,24 +408,25 @@ public class Factoring implements Scheduler {
                         }
                         lower = "" + (low_double);
 
-                        up_double = (double) (low_double + cs_double - 1);
+                        up_double = (double) (low_double + cs_double );
                         upper = "" + (up_double);
-                        if (up_double >= max_double || i == totalnodes) {
+                        if (up_double >= max_double) {
                             upper = "" + (max_double);
                             chunksCreated = true;
                         }
                         lupper_double = up_double;
-                        if (i % totalnodes == 0) {
-                            diff_double = (double) (diff_double - (cs_double * totalnodes));
-                        }
+
                     }
-                    result.add(new ParallelForSENP(lower, upper, ""));
+                    if (i % totalnodes == 0) {
+                        diff_double = (double) (diff_double - (cs_double * totalnodes));
+                    }
+                    result.add(new ParallelForSENP(lower, upper,"",chunksize));
                     break;
             }
             i++;
         }
         i = 0;
-        for (int j = 0; j <= result.size(); j++) {
+        for (int j = 0; j < result.size(); j++) {
             if (i == nodes.size() - 1) {
                 i = 0;
             }

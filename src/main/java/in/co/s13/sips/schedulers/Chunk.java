@@ -124,7 +124,7 @@ public class Chunk implements Scheduler {
                         }
 
                     }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                    result.add(new ParallelForSENP(lower, upper, get.getUuid(),chunksize));
                     break;
                 case 1:
                     chunksize = "" + diff_short / totalnodes;
@@ -153,7 +153,7 @@ public class Chunk implements Scheduler {
                         }
 
                     }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                    result.add(new ParallelForSENP(lower, upper, get.getUuid(),chunksize));
                     break;
                 case 2:
                     chunksize = "" + diff_int / totalnodes;
@@ -182,7 +182,7 @@ public class Chunk implements Scheduler {
                         }
 
                     }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                    result.add(new ParallelForSENP(lower, upper, get.getUuid(),chunksize));
                     break;
                 case 3:
 
@@ -211,7 +211,7 @@ public class Chunk implements Scheduler {
                             upper = "" + (min_long + up_long);
                         }
                     }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                    result.add(new ParallelForSENP(lower, upper, get.getUuid(),chunksize));
                     break;
                 case 4:
                     chunksize = "" + diff_float / totalnodes;
@@ -239,7 +239,7 @@ public class Chunk implements Scheduler {
                         }
 
                     }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                    result.add(new ParallelForSENP(lower, upper, get.getUuid(),chunksize));
                     break;
                 case 5:
                     chunksize = "" + diff_double / totalnodes;
@@ -268,7 +268,7 @@ public class Chunk implements Scheduler {
                         }
 
                     }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                    result.add(new ParallelForSENP(lower, upper, get.getUuid(),chunksize));
                     break;
 
             }
