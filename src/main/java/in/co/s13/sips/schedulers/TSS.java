@@ -29,6 +29,8 @@ import org.json.JSONObject;
 
 public class TSS implements Scheduler {
 
+    int nodes;
+
     @Override
     public ArrayList<TaskNodePair> schedule() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -53,12 +55,12 @@ public class TSS implements Scheduler {
         }
         String chunksize, lower, upper;
         boolean reverseloop = loop.isReverse();
-        byte min_byte = 0, max_byte = 0, diff_byte = 0, low_byte, up_byte, cs_byte, lupper_byte = 0,fc_byte,lc_byte,TSSred_byte = 0,lcs_byte = 0;
-        short min_short = 0, max_short = 0, diff_short = 0, low_short, up_short, cs_short, lupper_short = 0,fc_short,lc_short,TSSred_short = 0,lcs_short = 0;
-        int min_int = 0, max_int = 0, diff_int = 0, low_int, up_int, cs_int, lupper_int = 0,fc_int,lc_int,TSSred_int = 0,lcs_int = 0;
-        long min_long = 0, max_long = 0, diff_long = 0, low_long, up_long, cs_long, lupper_long = 0,fc_long,lc_long,TSSred_long = 0,lcs_long = 0;
-        float min_float = 0, max_float = 0, diff_float = 0, low_float, up_float, cs_float, lupper_float = 0,fc_float,lc_float,TSSred_float = 0,lcs_float = 0;
-        double min_double = 0, max_double = 0, diff_double = 0, low_double, up_double, cs_double, lupper_double = 0,fc_double,lc_double,TSSred_double = 0,lcs_double = 0;
+        byte min_byte = 0, max_byte = 0, diff_byte = 0, low_byte, up_byte, cs_byte, lupper_byte = 0, fc_byte, lc_byte, TSSred_byte = 0, lcs_byte = 0;
+        short min_short = 0, max_short = 0, diff_short = 0, low_short, up_short, cs_short, lupper_short = 0, fc_short, lc_short, TSSred_short = 0, lcs_short = 0;
+        int min_int = 0, max_int = 0, diff_int = 0, low_int, up_int, cs_int, lupper_int = 0, fc_int, lc_int, TSSred_int = 0, lcs_int = 0;
+        long min_long = 0, max_long = 0, diff_long = 0, low_long, up_long, cs_long, lupper_long = 0, fc_long, lc_long, TSSred_long = 0, lcs_long = 0;
+        float min_float = 0, max_float = 0, diff_float = 0, low_float, up_float, cs_float, lupper_float = 0, fc_float, lc_float, TSSred_float = 0, lcs_float = 0;
+        double min_double = 0, max_double = 0, diff_double = 0, low_double, up_double, cs_double, lupper_double = 0, fc_double, lc_double, TSSred_double = 0, lcs_double = 0;
 
         switch (loop.getDataType()) {
             case 0:
@@ -435,8 +437,11 @@ public class TSS implements Scheduler {
             }
 
         }
-
+        this.nodes = nodes.size();
         return result;
     }
-
+  @Override
+    public int getTotalNodes() {
+        return this.nodes;
+    }
 }

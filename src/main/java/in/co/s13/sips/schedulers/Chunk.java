@@ -29,17 +29,19 @@ import org.json.JSONObject;
 
 public class Chunk implements Scheduler {
 
+    int nodes;
+
     @Override
     public ArrayList<TaskNodePair> schedule() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public ArrayList<ParallelForSENP> scheduleParallelFor(ConcurrentHashMap<String,Node> livenodes, ParallelForLoop loop, JSONObject schedulerSettings) {
+    public ArrayList<ParallelForSENP> scheduleParallelFor(ConcurrentHashMap<String, Node> livenodes, ParallelForLoop loop, JSONObject schedulerSettings) {
         ArrayList<ParallelForSENP> result = new ArrayList<>();
-        ArrayList<Node> nodes= new ArrayList<>();
+        ArrayList<Node> nodes = new ArrayList<>();
         nodes.addAll(livenodes.values());
-        
+
         System.out.println("Before Sorting:" + nodes);
         // first sort score in decending order, then distance in ascending order
         Collections.sort(nodes, LiveNode.LiveNodeComparator.QWAIT.thenComparing(LiveNode.LiveNodeComparator.QLEN.reversed()).thenComparing(LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.reversed()).thenComparing(LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT));
@@ -272,8 +274,13 @@ public class Chunk implements Scheduler {
             }
 
         }
-
+        this.nodes = nodes.size();
         return result;
+    }
+
+    @Override
+    public int getTotalNodes() {
+        return this.nodes;
     }
 
 }

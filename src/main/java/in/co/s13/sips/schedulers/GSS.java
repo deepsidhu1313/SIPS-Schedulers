@@ -26,11 +26,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONObject;
+
 /**
  * Guided Self Scheduler
+ *
  * @author nika
  */
 public class GSS implements Scheduler {
+
+    int nodes;
 
     @Override
     public ArrayList<TaskNodePair> schedule() {
@@ -94,298 +98,316 @@ public class GSS implements Scheduler {
                 break;
         }
         int totalnodes = nodes.size();
-
-        for (int i = 1; i <= nodes.size(); i++) {
-            Node get = nodes.get(i - 1);
-            switch (loop.getDataType()) {
-                case 0:
-                    cs_byte = (byte) Math.ceil((double) diff_byte / (double) totalnodes);
-                    if (cs_byte < 1) {
-                        cs_byte = 1;
-                    }
-                    chunksize = "" + cs_byte;
-
-                    if (reverseloop) {
-                        if (i == 1) {
-                            low_byte = (byte) (0);
-                            low_byte = (byte) (min_byte - low_byte);
-
-                        } else {
-                            low_byte = (byte) (lupper_byte - 1);
+        boolean chunksCreated = false;
+        while ((!chunksCreated)) {
+            for (int i = 1; i <= nodes.size(); i++) {
+                Node get = nodes.get(i - 1);
+                switch (loop.getDataType()) {
+                    case 0:
+                        cs_byte = (byte) Math.ceil((double) diff_byte / (double) totalnodes);
+                        if (cs_byte < 1) {
+                            cs_byte = 1;
                         }
+                        chunksize = "" + cs_byte;
 
-                        lower = "" + (low_byte);
-                        up_byte = (byte) (low_byte - cs_byte + 1);
-                        upper = "" + (up_byte);
+                        if (reverseloop) {
+                            if (i == 1) {
+                                low_byte = (byte) (0);
+                                low_byte = (byte) (min_byte - low_byte);
 
-                        if (lupper_byte <= max_byte) {
-                            upper = "" + (max_byte);
-                        }
+                            } else {
+                                low_byte = (byte) (lupper_byte - 1);
+                            }
 
-                    } else {
+                            lower = "" + (low_byte);
+                            up_byte = (byte) (low_byte - cs_byte + 1);
+                            upper = "" + (up_byte);
 
-                        if (i == 1) {
-
-                            low_byte = (byte) (0);
-                            low_byte = (byte) (min_byte + low_byte);
+                            if (lupper_byte <= max_byte) {
+                                upper = "" + (max_byte);
+                                chunksCreated = true;
+                            }
 
                         } else {
 
-                            low_byte = (byte) (lupper_byte + 1);
+                            if (i == 1) {
 
+                                low_byte = (byte) (0);
+                                low_byte = (byte) (min_byte + low_byte);
+
+                            } else {
+
+                                low_byte = (byte) (lupper_byte + 1);
+
+                            }
+                            lower = "" + (low_byte);
+
+                            up_byte = (byte) (low_byte + cs_byte - 1);
+                            upper = "" + (up_byte);
+                            if (up_byte >= max_byte) {
+                                upper = "" + (max_byte);
+                                chunksCreated = true;
+                            }
+                            lupper_byte = up_byte;
+                            diff_byte = (byte) (diff_byte - cs_byte);
                         }
-                        lower = "" + (low_byte);
-
-                        up_byte = (byte) (low_byte + cs_byte - 1);
-                        upper = "" + (up_byte);
-                        if (up_byte >= max_byte) {
-                            upper = "" + (max_byte);
+                        result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                        break;
+                    case 1:
+                        cs_short = (short) Math.ceil((double) diff_short / (double) totalnodes);
+                        chunksize = "" + cs_short;
+                        if (cs_short < 1) {
+                            cs_short = 1;
                         }
-                        lupper_byte = up_byte;
-                        diff_byte = (byte) (diff_byte - cs_byte);
-                    }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
-                    break;
-                case 1:
-                    cs_short = (short) Math.ceil((double) diff_short / (double) totalnodes);
-                    chunksize = "" + cs_short;
-                    if (cs_short < 1) {
-                        cs_short = 1;
-                    }
-                    if (reverseloop) {
-                        if (i == 1) {
-                            low_short = (short) (0);
-                            low_short = (short) (min_short - low_short);
+                        if (reverseloop) {
+                            if (i == 1) {
+                                low_short = (short) (0);
+                                low_short = (short) (min_short - low_short);
 
-                        } else {
-                            low_short = (short) (lupper_short - 1);
-                        }
+                            } else {
+                                low_short = (short) (lupper_short - 1);
+                            }
 
-                        lower = "" + (low_short);
-                        up_short = (short) (low_short - cs_short + 1);
-                        upper = "" + (up_short);
+                            lower = "" + (low_short);
+                            up_short = (short) (low_short - cs_short + 1);
+                            upper = "" + (up_short);
 
-                        if (lupper_short <= max_short) {
-                            upper = "" + (max_short);
-                        }
-
-                    } else {
-
-                        if (i == 1) {
-
-                            low_short = (short) (0);
-                            low_short = (short) (min_short + low_short);
-
-                        } else {
-
-                            low_short = (short) (lupper_short + 1);
-
-                        }
-                        lower = "" + (low_short);
-
-                        up_short = (short) (low_short + cs_short - 1);
-                        upper = "" + (up_short);
-                        if (up_short >= max_short) {
-                            upper = "" + (max_short);
-                        }
-                        lupper_short = up_short;
-                        diff_short = (short) (diff_short - cs_short);
-                    }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
-                    break;
-                case 2:
-                    cs_int = (int) Math.ceil((double) diff_int / (double) totalnodes);
-                    chunksize = "" + cs_int;
-                    if (cs_int < 1) {
-                        cs_int = 1;
-                    }
-                    if (reverseloop) {
-                        if (i == 1) {
-                            low_int = (int) (0);
-                            low_int = (int) (min_int - low_int);
-
-                        } else {
-                            low_int = (int) (lupper_int - 1);
-                        }
-
-                        lower = "" + (low_int);
-                        up_int = (int) (low_int - cs_int + 1);
-                        upper = "" + (up_int);
-
-                        if (lupper_int <= max_int) {
-                            upper = "" + (max_int);
-                        }
-
-                    } else {
-
-                        if (i == 1) {
-
-                            low_int = (int) (0);
-                            low_int = (int) (min_int + low_int);
+                            if (lupper_short <= max_short) {
+                                upper = "" + (max_short);
+                                chunksCreated = true;
+                            }
 
                         } else {
 
-                            low_int = (int) (lupper_int + 1);
+                            if (i == 1) {
 
+                                low_short = (short) (0);
+                                low_short = (short) (min_short + low_short);
+
+                            } else {
+
+                                low_short = (short) (lupper_short + 1);
+
+                            }
+                            lower = "" + (low_short);
+
+                            up_short = (short) (low_short + cs_short - 1);
+                            upper = "" + (up_short);
+                            if (up_short >= max_short) {
+                                upper = "" + (max_short);
+                                chunksCreated = true;
+                            }
+                            lupper_short = up_short;
+                            diff_short = (short) (diff_short - cs_short);
                         }
-                        lower = "" + (low_int);
-
-                        up_int = (int) (low_int + cs_int - 1);
-                        upper = "" + (up_int);
-                        if (up_int >= max_int) {
-                            upper = "" + (max_int);
+                        result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                        break;
+                    case 2:
+                        cs_int = (int) Math.ceil((double) diff_int / (double) totalnodes);
+                        chunksize = "" + cs_int;
+                        if (cs_int < 1) {
+                            cs_int = 1;
                         }
-                        lupper_int = up_int;
-                        diff_int = (int) (diff_int - cs_int);
-                    }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
-                    break;
-                case 3:
-                    cs_long = (long) Math.ceil((double) diff_long / (double) totalnodes);
-                    chunksize = "" + cs_long;
-                    if (cs_long < 1) {
-                        cs_long = 1;
-                    }
-                    if (reverseloop) {
-                        if (i == 1) {
-                            low_long = (long) (0);
-                            low_long = (long) (min_long - low_long);
+                        if (reverseloop) {
+                            if (i == 1) {
+                                low_int = (int) (0);
+                                low_int = (int) (min_int - low_int);
 
-                        } else {
-                            low_long = (long) (lupper_long - 1);
-                        }
+                            } else {
+                                low_int = (int) (lupper_int - 1);
+                            }
 
-                        lower = "" + (low_long);
-                        up_long = (long) (low_long - cs_long + 1);
-                        upper = "" + (up_long);
+                            lower = "" + (low_int);
+                            up_int = (int) (low_int - cs_int + 1);
+                            upper = "" + (up_int);
 
-                        if (lupper_long <= max_long) {
-                            upper = "" + (max_long);
-                        }
-
-                    } else {
-
-                        if (i == 1) {
-
-                            low_long = (long) (0);
-                            low_long = (long) (min_long + low_long);
-
-                        } else {
-
-                            low_long = (long) (lupper_long + 1);
-
-                        }
-                        lower = "" + (low_long);
-
-                        up_long = (long) (low_long + cs_long - 1);
-                        upper = "" + (up_long);
-                        if (up_long >= max_long) {
-                            upper = "" + (max_long);
-                        }
-                        lupper_long = up_long;
-                        diff_long = (long) (diff_long - cs_long);
-                    }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
-                    break;
-                case 4:
-                    cs_float = (float) Math.ceil((double) diff_float / (double) totalnodes);
-                    chunksize = "" + cs_float;
-                    if (cs_float < 1) {
-                        cs_float = 1;
-                    }
-                    if (reverseloop) {
-                        if (i == 1) {
-                            low_float = (float) (0);
-                            low_float = (float) (min_float - low_float);
-
-                        } else {
-                            low_float = (float) (lupper_float - 1);
-                        }
-
-                        lower = "" + (low_float);
-                        up_float = (float) (low_float - cs_float + 1);
-                        upper = "" + (up_float);
-
-                        if (lupper_float <= max_float) {
-                            upper = "" + (max_float);
-                        }
-
-                    } else {
-
-                        if (i == 1) {
-
-                            low_float = (float) (0);
-                            low_float = (float) (min_float + low_float);
+                            if (lupper_int <= max_int) {
+                                upper = "" + (max_int);
+                                chunksCreated = true;
+                            }
 
                         } else {
 
-                            low_float = (float) (lupper_float + 1);
+                            if (i == 1) {
 
-                        }
-                        lower = "" + (low_float);
+                                low_int = (int) (0);
+                                low_int = (int) (min_int + low_int);
 
-                        up_float = (float) (low_float + cs_float - 1);
-                        upper = "" + (up_float);
-                        if (up_float >= max_float) {
-                            upper = "" + (max_float);
+                            } else {
+
+                                low_int = (int) (lupper_int + 1);
+
+                            }
+                            lower = "" + (low_int);
+
+                            up_int = (int) (low_int + cs_int - 1);
+                            upper = "" + (up_int);
+                            if (up_int >= max_int) {
+                                upper = "" + (max_int);
+                                chunksCreated = true;
+                            }
+                            lupper_int = up_int;
+                            diff_int = (int) (diff_int - cs_int);
                         }
-                        lupper_float = up_float;
-                        diff_float = (float) (diff_float - cs_float);
-                    }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
-                    break;
-                case 5:
-                    cs_double = (double) Math.ceil((double) diff_double / (double) totalnodes);
-                    chunksize = "" + cs_double;
-                    if (cs_double < 1) {
-                        cs_double = 1;
-                    }
-                    if (reverseloop) {
-                        if (i == 1) {
-                            low_double = (double) (0);
-                            low_double = (double) (min_double - low_double);
+                        result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                        break;
+                    case 3:
+                        cs_long = (long) Math.ceil((double) diff_long / (double) totalnodes);
+                        chunksize = "" + cs_long;
+                        if (cs_long < 1) {
+                            cs_long = 1;
+                        }
+                        if (reverseloop) {
+                            if (i == 1) {
+                                low_long = (long) (0);
+                                low_long = (long) (min_long - low_long);
+
+                            } else {
+                                low_long = (long) (lupper_long - 1);
+                            }
+
+                            lower = "" + (low_long);
+                            up_long = (long) (low_long - cs_long + 1);
+                            upper = "" + (up_long);
+
+                            if (lupper_long <= max_long) {
+                                upper = "" + (max_long);
+                                chunksCreated = true;
+                            }
 
                         } else {
-                            low_double = (double) (lupper_double - 1);
+
+                            if (i == 1) {
+
+                                low_long = (long) (0);
+                                low_long = (long) (min_long + low_long);
+
+                            } else {
+
+                                low_long = (long) (lupper_long + 1);
+
+                            }
+                            lower = "" + (low_long);
+
+                            up_long = (long) (low_long + cs_long - 1);
+                            upper = "" + (up_long);
+                            if (up_long >= max_long) {
+                                upper = "" + (max_long);
+                                chunksCreated = true;
+                            }
+                            lupper_long = up_long;
+                            diff_long = (long) (diff_long - cs_long);
                         }
-
-                        lower = "" + (low_double);
-                        up_double = (double) (low_double - cs_double + 1);
-                        upper = "" + (up_double);
-
-                        if (lupper_double <= max_double) {
-                            upper = "" + (max_double);
+                        result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                        break;
+                    case 4:
+                        cs_float = (float) Math.ceil((double) diff_float / (double) totalnodes);
+                        chunksize = "" + cs_float;
+                        if (cs_float < 1) {
+                            cs_float = 1;
                         }
+                        if (reverseloop) {
+                            if (i == 1) {
+                                low_float = (float) (0);
+                                low_float = (float) (min_float - low_float);
 
-                    } else {
+                            } else {
+                                low_float = (float) (lupper_float - 1);
+                            }
 
-                        if (i == 1) {
+                            lower = "" + (low_float);
+                            up_float = (float) (low_float - cs_float + 1);
+                            upper = "" + (up_float);
 
-                            low_double = (double) (0);
-                            low_double = (double) (min_double + low_double);
+                            if (lupper_float <= max_float) {
+                                upper = "" + (max_float);
+                                chunksCreated = true;
+                            }
 
                         } else {
 
-                            low_double = (double) (lupper_double + 1);
+                            if (i == 1) {
 
+                                low_float = (float) (0);
+                                low_float = (float) (min_float + low_float);
+
+                            } else {
+
+                                low_float = (float) (lupper_float + 1);
+
+                            }
+                            lower = "" + (low_float);
+
+                            up_float = (float) (low_float + cs_float - 1);
+                            upper = "" + (up_float);
+                            if (up_float >= max_float) {
+                                upper = "" + (max_float);
+                                chunksCreated = true;
+                            }
+                            lupper_float = up_float;
+                            diff_float = (float) (diff_float - cs_float);
                         }
-                        lower = "" + (low_double);
-
-                        up_double = (double) (low_double + cs_double - 1);
-                        upper = "" + (up_double);
-                        if (up_double >= max_double) {
-                            upper = "" + (max_double);
+                        result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                        break;
+                    case 5:
+                        cs_double = (double) Math.ceil((double) diff_double / (double) totalnodes);
+                        chunksize = "" + cs_double;
+                        if (cs_double < 1) {
+                            cs_double = 1;
                         }
-                        lupper_double = up_double;
-                        diff_double = (double) (diff_double - cs_double);
-                    }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid()));
-                    break;
+                        if (reverseloop) {
+                            if (i == 1) {
+                                low_double = (double) (0);
+                                low_double = (double) (min_double - low_double);
 
+                            } else {
+                                low_double = (double) (lupper_double - 1);
+                            }
+
+                            lower = "" + (low_double);
+                            up_double = (double) (low_double - cs_double + 1);
+                            upper = "" + (up_double);
+
+                            if (lupper_double <= max_double) {
+                                upper = "" + (max_double);
+                                chunksCreated = true;
+                            }
+
+                        } else {
+
+                            if (i == 1) {
+
+                                low_double = (double) (0);
+                                low_double = (double) (min_double + low_double);
+
+                            } else {
+
+                                low_double = (double) (lupper_double + 1);
+
+                            }
+                            lower = "" + (low_double);
+
+                            up_double = (double) (low_double + cs_double - 1);
+                            upper = "" + (up_double);
+                            if (up_double >= max_double) {
+                                upper = "" + (max_double);
+                                chunksCreated = true;
+                            }
+                            lupper_double = up_double;
+                            diff_double = (double) (diff_double - cs_double);
+                        }
+                        result.add(new ParallelForSENP(lower, upper, get.getUuid()));
+                        break;
+
+                }
             }
         }
-
+        this.nodes = nodes.size();
         return result;
     }
 
+    @Override
+    public int getTotalNodes() {
+        return this.nodes;
+    }
 }

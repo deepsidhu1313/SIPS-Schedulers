@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONObject;
 
 public class QSS implements Scheduler {
-
+    int nodes;
     @Override
     public ArrayList<TaskNodePair> schedule() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -498,8 +498,11 @@ public class QSS implements Scheduler {
             }
 
         }
-
+this.nodes = nodes.size();
         return result;
     }
-
+  @Override
+    public int getTotalNodes() {
+        return this.nodes;
+    }
 }

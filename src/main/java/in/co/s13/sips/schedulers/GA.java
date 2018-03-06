@@ -35,6 +35,8 @@ import org.json.JSONObject;
  */
 public class GA implements Scheduler {
 
+    int nodes;
+
     @Override
     public ArrayList<TaskNodePair> schedule() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -441,7 +443,13 @@ public class GA implements Scheduler {
             bestChromosome.getElements().get((int) (Math.random() * (bestChromosome.getElements().size() - 1))).setNodeUUID(bestNode.getUuid());
         }
         System.out.println("Best Chromosome:" + bestChromosome.getElements());
+        this.nodes = bestChromosome.getElements().size();
         return bestChromosome.getElements();
+    }
+
+    @Override
+    public int getTotalNodes() {
+        return this.nodes;
     }
 
     private class Chromosome {

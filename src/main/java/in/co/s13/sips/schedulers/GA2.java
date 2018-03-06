@@ -36,6 +36,8 @@ import org.json.JSONObject;
  */
 public class GA2 implements Scheduler {
 
+    int nodes;
+
     @Override
     public ArrayList<TaskNodePair> schedule() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -354,15 +356,15 @@ public class GA2 implements Scheduler {
         Chromosome<ParallelForSENP> bestPossibleChromosome = new Chromosome(elements);
         Chromosome<ParallelForSENP> bestChromosome = new Chromosome(elements);
         Collections.sort(nodes, (LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT));
-        
+
         ArrayList<Chromosome> chromosomes = new ArrayList<>();
         for (int i = 0; i < maxPopulation; i++) {
             ArrayList<ParallelForSENP> al = bestPossibleChromosome.getElements();
             for (int j = 0; j < al.size(); j++) {
                 ParallelForSENP get = al.get(j);
                 ParallelForSENP newParallelForSENP = new ParallelForSENP(get);
-                Processor processor= processors.get(nodes.get((int)(nodes.indexOf(liveNodes.get(get.getNodeUUID()))*Math.random())));
-                
+                Processor processor = processors.get(nodes.get((int) (nodes.indexOf(liveNodes.get(get.getNodeUUID())) * Math.random())));
+
             }
         }
         for (int i = 0; i < maxGenerations; i++) {
@@ -410,7 +412,13 @@ public class GA2 implements Scheduler {
             bestChromosome.getElements().get((int) (Math.random() * (bestChromosome.getElements().size() - 1))).setNodeUUID(nodes.get(0).getUuid());
         }
         System.out.println("Best Chromosome:" + bestChromosome.getElements());
+        this.nodes = bestChromosome.getElements().size();
         return bestChromosome.getElements();
+    }
+
+    @Override
+    public int getTotalNodes() {
+        return this.nodes;
     }
 
     private class Chromosome<T> {
