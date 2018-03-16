@@ -96,8 +96,10 @@ public class TSS implements Scheduler {
         }
         int totalnodes = nodes.size();
 
-        for (int i = 1; i <= nodes.size(); i++) {
-            Node get = nodes.get(i - 1);
+        boolean chunksCreated = false;
+        int i = 1;
+        while ((!chunksCreated)) {
+
             switch (loop.getDataType()) {
                 case 0:
                     if (i == 1) {
@@ -128,6 +130,7 @@ public class TSS implements Scheduler {
 
                         if (lupper_byte <= max_byte) {
                             upper = "" + (max_byte);
+                            chunksCreated = true;
                         }
 
                     } else {
@@ -148,12 +151,12 @@ public class TSS implements Scheduler {
                         upper = "" + (up_byte);
                         if (up_byte >= max_byte) {
                             upper = "" + (max_byte);
+                            chunksCreated = true;
                         }
                         lupper_byte = up_byte;
-                        if (i % totalnodes == 0) {
-                            diff_byte = (byte) (diff_byte - (cs_byte * totalnodes));
-                        }
+
                     }
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
                 case 1:
                     if (i == 1) {
@@ -183,6 +186,7 @@ public class TSS implements Scheduler {
 
                         if (lupper_short <= max_short) {
                             upper = "" + (max_short);
+                            chunksCreated = true;
                         }
 
                     } else {
@@ -203,12 +207,12 @@ public class TSS implements Scheduler {
                         upper = "" + (up_short);
                         if (up_short >= max_short) {
                             upper = "" + (max_short);
+                            chunksCreated = true;
                         }
                         lupper_short = up_short;
-                        if (i % totalnodes == 0) {
-                            diff_short = (short) (diff_short - (cs_short * totalnodes));
-                        }
+
                     }
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
                 case 2:
 
@@ -239,6 +243,7 @@ public class TSS implements Scheduler {
 
                         if (lupper_int <= max_int) {
                             upper = "" + (max_int);
+                            chunksCreated = true;
                         }
 
                     } else {
@@ -259,12 +264,12 @@ public class TSS implements Scheduler {
                         upper = "" + (up_int);
                         if (up_int >= max_int) {
                             upper = "" + (max_int);
+                            chunksCreated = true;
                         }
                         lupper_int = up_int;
-                        if (i % totalnodes == 0) {
-                            diff_int = (int) (diff_int - (cs_int * totalnodes));
-                        }
+
                     }
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
                 case 3:
 
@@ -295,6 +300,7 @@ public class TSS implements Scheduler {
 
                         if (lupper_long <= max_long) {
                             upper = "" + (max_long);
+                            chunksCreated = true;
                         }
 
                     } else {
@@ -315,12 +321,12 @@ public class TSS implements Scheduler {
                         upper = "" + (up_long);
                         if (up_long >= max_long) {
                             upper = "" + (max_long);
+                            chunksCreated = true;
                         }
                         lupper_long = up_long;
-                        if (i % totalnodes == 0) {
-                            diff_long = (long) (diff_long - (cs_long * totalnodes));
-                        }
+
                     }
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
                 case 4:
 
@@ -351,6 +357,7 @@ public class TSS implements Scheduler {
 
                         if (lupper_float <= max_float) {
                             upper = "" + (max_float);
+                            chunksCreated = true;
                         }
 
                     } else {
@@ -371,12 +378,12 @@ public class TSS implements Scheduler {
                         upper = "" + (up_float);
                         if (up_float >= max_float) {
                             upper = "" + (max_float);
+                            chunksCreated = true;
                         }
                         lupper_float = up_float;
-                        if (i % totalnodes == 0) {
-                            diff_float = (float) (diff_float - (cs_float * totalnodes));
-                        }
+
                     }
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
                 case 5:
 
@@ -407,6 +414,7 @@ public class TSS implements Scheduler {
 
                         if (lupper_double <= max_double) {
                             upper = "" + (max_double);
+                            chunksCreated = true;
                         }
 
                     } else {
@@ -427,20 +435,30 @@ public class TSS implements Scheduler {
                         upper = "" + (up_double);
                         if (up_double >= max_double) {
                             upper = "" + (max_double);
+                            chunksCreated = true;
                         }
                         lupper_double = up_double;
-                        if (i % totalnodes == 0) {
-                            diff_double = (double) (diff_double - (cs_double * totalnodes));
-                        }
+
                     }
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
             }
 
         }
+        i = 0;
+        for (int j = 0; j < result.size(); j++) {
+            if (i == nodes.size() - 1) {
+                i = 0;
+            }
+            ParallelForSENP get = result.get(j);
+            get.setNodeUUID(nodes.get(i).getUuid());
+            i++;
+        }
         this.nodes = nodes.size();
         return result;
     }
-  @Override
+
+    @Override
     public int getTotalNodes() {
         return this.nodes;
     }

@@ -28,7 +28,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONObject;
 
 public class QSS implements Scheduler {
+
     int nodes;
+
     @Override
     public ArrayList<TaskNodePair> schedule() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -53,12 +55,12 @@ public class QSS implements Scheduler {
         }
         String chunksize, lower, upper;
         boolean reverseloop = loop.isReverse();
-        byte min_byte = 0, max_byte = 0, diff_byte = 0, low_byte, up_byte, fc_byte, lc_byte,cs_byte,lcs_byte,QSSn_byte,QSSa_byte = 0,QSSb_byte = 0,QSSc_byte = 0,lupper_byte = 0;
-        short min_short = 0, max_short = 0, diff_short = 0, low_short, up_short, fc_short, lc_short,cs_short,lcs_short,QSSn_short,QSSa_short = 0,QSSb_short = 0,QSSc_short = 0,lupper_short = 0;
-        int min_int = 0, max_int = 0, diff_int = 0, low_int, up_int, fc_int, lc_int,cs_int,lcs_int,QSSn_int,QSSa_int = 0,QSSb_int = 0,QSSc_int = 0,lupper_int = 0;
-        long min_long = 0, max_long = 0, diff_long = 0, low_long, up_long, fc_long, lc_long,cs_long,lcs_long,QSSn_long,QSSa_long = 0,QSSb_long = 0,QSSc_long = 0,lupper_long = 0;
-        float min_float = 0, max_float = 0, diff_float = 0, low_float, up_float, fc_float, lc_float,cs_float,lcs_float,QSSn_float,QSSa_float = 0,QSSb_float = 0,QSSc_float = 0,lupper_float = 0;
-        double min_double = 0, max_double = 0, diff_double = 0, low_double, up_double, fc_double, lc_double,cs_double,lcs_double,QSSn_double,QSSa_double = 0,QSSb_double = 0,QSSc_double = 0,lupper_double = 0;
+        byte min_byte = 0, max_byte = 0, diff_byte = 0, low_byte, up_byte, fc_byte, lc_byte, cs_byte, lcs_byte, QSSn_byte, QSSa_byte = 0, QSSb_byte = 0, QSSc_byte = 0, lupper_byte = 0;
+        short min_short = 0, max_short = 0, diff_short = 0, low_short, up_short, fc_short, lc_short, cs_short, lcs_short, QSSn_short, QSSa_short = 0, QSSb_short = 0, QSSc_short = 0, lupper_short = 0;
+        int min_int = 0, max_int = 0, diff_int = 0, low_int, up_int, fc_int, lc_int, cs_int, lcs_int, QSSn_int, QSSa_int = 0, QSSb_int = 0, QSSc_int = 0, lupper_int = 0;
+        long min_long = 0, max_long = 0, diff_long = 0, low_long, up_long, fc_long, lc_long, cs_long, lcs_long, QSSn_long, QSSa_long = 0, QSSb_long = 0, QSSc_long = 0, lupper_long = 0;
+        float min_float = 0, max_float = 0, diff_float = 0, low_float, up_float, fc_float, lc_float, cs_float, lcs_float, QSSn_float, QSSa_float = 0, QSSb_float = 0, QSSc_float = 0, lupper_float = 0;
+        double min_double = 0, max_double = 0, diff_double = 0, low_double, up_double, fc_double, lc_double, cs_double, lcs_double, QSSn_double, QSSa_double = 0, QSSb_double = 0, QSSc_double = 0, lupper_double = 0;
         switch (loop.getDataType()) {
             case 0:
                 min_byte = (byte) loop.getInit();
@@ -92,9 +94,10 @@ public class QSS implements Scheduler {
                 break;
         }
         int totalnodes = nodes.size();
+        boolean chunksCreated = false;
+        int i = 1;
+        while ((!chunksCreated)) {
 
-        for (int i = 1; i <= nodes.size(); i++) {
-            Node get = nodes.get(i - 1);
             switch (loop.getDataType()) {
                 case 0:
                     if (i == 1) {
@@ -134,6 +137,7 @@ public class QSS implements Scheduler {
 
                         if (lupper_byte <= max_byte) {
                             upper = "" + (max_byte);
+                            chunksCreated = true;
                         }
 
                     } else {
@@ -154,12 +158,12 @@ public class QSS implements Scheduler {
                         upper = "" + (up_byte);
                         if (up_byte >= max_byte) {
                             upper = "" + (max_byte);
+                            chunksCreated = true;
                         }
                         lupper_byte = up_byte;
-                        if (i % totalnodes == 0) {
-                            diff_byte = (byte) (diff_byte - (cs_byte * totalnodes));
-                        }
+                        
                     }
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
                 case 1:
                     if (i == 1) {
@@ -199,6 +203,7 @@ public class QSS implements Scheduler {
 
                         if (lupper_short <= max_short) {
                             upper = "" + (max_short);
+                            chunksCreated = true;
                         }
 
                     } else {
@@ -219,12 +224,12 @@ public class QSS implements Scheduler {
                         upper = "" + (up_short);
                         if (up_short >= max_short) {
                             upper = "" + (max_short);
+                            chunksCreated = true;
                         }
                         lupper_short = up_short;
-                        if (i % totalnodes == 0) {
-                            diff_short = (short) (diff_short - (cs_short * totalnodes));
-                        }
+                        
                     }
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
                 case 2:
                     if (i == 1) {
@@ -265,6 +270,7 @@ public class QSS implements Scheduler {
 
                         if (lupper_int <= max_int) {
                             upper = "" + (max_int);
+                            chunksCreated = true;
                         }
 
                     } else {
@@ -285,12 +291,12 @@ public class QSS implements Scheduler {
                         upper = "" + (up_int);
                         if (up_int >= max_int) {
                             upper = "" + (max_int);
+                            chunksCreated = true;
                         }
                         lupper_int = up_int;
-                        if (i % totalnodes == 0) {
-                            diff_int = (int) (diff_int - (cs_int * totalnodes));
-                        }
+                        
                     }
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
                 case 3:
 
@@ -333,6 +339,7 @@ public class QSS implements Scheduler {
 
                         if (lupper_long <= max_long) {
                             upper = "" + (max_long);
+                            chunksCreated = true;
                         }
 
                     } else {
@@ -353,12 +360,12 @@ public class QSS implements Scheduler {
                         upper = "" + (up_long);
                         if (up_long >= max_long) {
                             upper = "" + (max_long);
+                            chunksCreated = true;
                         }
                         lupper_long = up_long;
-                        if (i % totalnodes == 0) {
-                            diff_long = (long) (diff_long - (cs_long * totalnodes));
-                        }
+                        
                     }
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
                 case 4:
 
@@ -400,6 +407,7 @@ public class QSS implements Scheduler {
 
                         if (lupper_float <= max_float) {
                             upper = "" + (max_float);
+                            chunksCreated = true;
                         }
 
                     } else {
@@ -420,12 +428,12 @@ public class QSS implements Scheduler {
                         upper = "" + (up_float);
                         if (up_float >= max_float) {
                             upper = "" + (max_float);
+                            chunksCreated = true;
                         }
                         lupper_float = up_float;
-                        if (i % totalnodes == 0) {
-                            diff_float = (float) (diff_float - (cs_float * totalnodes));
-                        }
+                        
                     }
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
                 case 5:
 
@@ -467,6 +475,7 @@ public class QSS implements Scheduler {
 
                         if (lupper_double <= max_double) {
                             upper = "" + (max_double);
+                            chunksCreated = true;
                         }
 
                     } else {
@@ -487,21 +496,31 @@ public class QSS implements Scheduler {
                         upper = "" + (up_double);
                         if (up_double >= max_double) {
                             upper = "" + (max_double);
+                            chunksCreated = true;
                         }
                         lupper_double = up_double;
-                        if (i % totalnodes == 0) {
-                            diff_double = (double) (diff_double - (cs_double * totalnodes));
-                        }
+                        
                     }
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
 
             }
-
+            i++;
         }
-this.nodes = nodes.size();
+        i = 0;
+        for (int j = 0; j < result.size(); j++) {
+            if (i == nodes.size() - 1) {
+                i = 0;
+            }
+            ParallelForSENP get = result.get(j);
+            get.setNodeUUID(nodes.get(i).getUuid());
+            i++;
+        }
+        this.nodes = nodes.size();
         return result;
     }
-  @Override
+
+    @Override
     public int getTotalNodes() {
         return this.nodes;
     }

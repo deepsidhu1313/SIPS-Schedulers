@@ -45,17 +45,17 @@ public class Factoring implements Scheduler {
     @Override
     public ArrayList<ParallelForSENP> scheduleParallelFor(ConcurrentHashMap<String, Node> livenodes, ParallelForLoop loop, JSONObject schedulerSettings) {
         ArrayList<ParallelForSENP> result = new ArrayList<>();
-        ArrayList<Node> nodes = new ArrayList<>();
-        nodes.addAll(livenodes.values());
+        ArrayList<Node> nodesList = new ArrayList<>();
+        nodesList.addAll(livenodes.values());
 
-        System.out.println("Before Sorting:" + nodes);
+        System.out.println("Before Sorting:" + nodesList);
         // first sort score in decending order, then distance in ascending order
-        Collections.sort(nodes, LiveNode.LiveNodeComparator.QWAIT.thenComparing(LiveNode.LiveNodeComparator.QLEN.reversed()).thenComparing(LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.reversed()).thenComparing(LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT));
-        System.out.println("After Sorting:" + nodes);
+        Collections.sort(nodesList, LiveNode.LiveNodeComparator.QWAIT.thenComparing(LiveNode.LiveNodeComparator.QLEN.reversed()).thenComparing(LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.reversed()).thenComparing(LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT));
+        System.out.println("After Sorting:" + nodesList);
         int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
-        if (maxNodes < nodes.size()) {
+        if (maxNodes < nodesList.size()) {
             // select best nodes for scheduling
-            nodes = new ArrayList<>(nodes.subList(0, maxNodes));
+            nodesList = new ArrayList<>(nodesList.subList(0, maxNodes));
         }
         String chunksize, lower, upper;
         boolean reverseloop = loop.isReverse();
@@ -98,7 +98,7 @@ public class Factoring implements Scheduler {
                 diff_double = (double) loop.getDiff();
                 break;
         }
-        int totalnodes = nodes.size();
+        int totalnodes = nodesList.size();
         boolean chunksCreated = false;
         int i = 1;
         while ((!chunksCreated)) {
@@ -427,14 +427,14 @@ public class Factoring implements Scheduler {
         }
         i = 0;
         for (int j = 0; j < result.size(); j++) {
-            if (i == nodes.size() - 1) {
+            if (i == nodesList.size() - 1) {
                 i = 0;
             }
             ParallelForSENP get = result.get(j);
-            get.setNodeUUID(nodes.get(i).getUuid());
+            get.setNodeUUID(nodesList.get(i).getUuid());
             i++;
         }
-        this.nodes = nodes.size();
+        this.nodes = nodesList.size();
         return result;
     }
 
