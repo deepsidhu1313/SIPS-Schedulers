@@ -58,6 +58,10 @@ public class GA implements Scheduler {
         int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
         int maxGenerations = schedulerSettings.getInt("MaxGenerations", 4);
         int maxPopulation = schedulerSettings.getInt("MaxPopulation", 8);
+        if (maxNodes > 8) {
+            Node node = liveNodes.get(in.co.s13.sips.lib.node.settings.GlobalValues.NODE_UUID);
+            nodes.remove(node);
+        }
         if (maxNodes < nodes.size()) {
             // select best nodes for scheduling
             nodes = new ArrayList<>(nodes.subList(0, maxNodes));

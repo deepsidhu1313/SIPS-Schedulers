@@ -47,6 +47,11 @@ public class Chunk implements Scheduler {
         Collections.sort(nodes, LiveNode.LiveNodeComparator.QWAIT.thenComparing(LiveNode.LiveNodeComparator.QLEN.reversed()).thenComparing(LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.reversed()).thenComparing(LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT));
         System.out.println("After Sorting:" + nodes);
         int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
+        
+        if (maxNodes > 8) {
+            Node node = livenodes.get(in.co.s13.sips.lib.node.settings.GlobalValues.NODE_UUID);
+            nodes.remove(node);
+        }
         if (maxNodes < nodes.size()) {
             // select best nodes for scheduling
             nodes = new ArrayList<>(nodes.subList(0, maxNodes));
