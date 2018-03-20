@@ -35,7 +35,8 @@ import org.json.JSONObject;
  */
 public class GA implements Scheduler {
 
-    int nodes;
+    private int nodes;
+    private ArrayList<Node> backupNodes = new ArrayList<>();
 
     @Override
     public ArrayList<TaskNodePair> schedule() {
@@ -454,12 +455,19 @@ public class GA implements Scheduler {
         }
         System.out.println("Best Chromosome:" + bestChromosome.getElements());
         this.nodes = bestChromosome.getElements().size();
+        backupNodes.addAll(nodes);
+
         return bestChromosome.getElements();
     }
 
     @Override
     public int getTotalNodes() {
         return this.nodes;
+    }
+
+    @Override
+    public ArrayList<Node> getBackupNodes() {
+        return backupNodes;
     }
 
     private class Chromosome {

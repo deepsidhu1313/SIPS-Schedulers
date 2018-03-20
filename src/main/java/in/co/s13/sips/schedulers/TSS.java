@@ -29,7 +29,8 @@ import org.json.JSONObject;
 
 public class TSS implements Scheduler {
 
-    int nodes;
+    private int nodes;
+    private ArrayList<Node> backupNodes = new ArrayList<>();
 
     @Override
     public ArrayList<TaskNodePair> schedule() {
@@ -459,11 +460,17 @@ public class TSS implements Scheduler {
             i++;
         }
         this.nodes = nodes.size();
+        backupNodes.addAll(nodes);
         return result;
     }
 
     @Override
     public int getTotalNodes() {
         return this.nodes;
+    }
+
+    @Override
+    public ArrayList<Node> getBackupNodes() {
+        return backupNodes;
     }
 }

@@ -35,7 +35,8 @@ import org.json.JSONObject;
  */
 public class Factoring implements Scheduler {
 
-    int nodes;
+    private int nodes;
+    private ArrayList<Node> backupNodes = new ArrayList<>();
 
     @Override
     public ArrayList<TaskNodePair> schedule() {
@@ -56,7 +57,8 @@ public class Factoring implements Scheduler {
         if (maxNodes > 8) {
             Node node = livenodes.get(in.co.s13.sips.lib.node.settings.GlobalValues.NODE_UUID);
             nodesList.remove(node);
-        }if (maxNodes < nodesList.size()) {
+        }
+        if (maxNodes < nodesList.size()) {
             // select best nodes for scheduling
             nodesList = new ArrayList<>(nodesList.subList(0, maxNodes));
         }
@@ -124,7 +126,7 @@ public class Factoring implements Scheduler {
                         }
 
                         lower = "" + (low_byte);
-                        up_byte = (byte) (low_byte - cs_byte );
+                        up_byte = (byte) (low_byte - cs_byte);
                         upper = "" + (up_byte);
 
                         if (lupper_byte <= max_byte) {
@@ -158,7 +160,7 @@ public class Factoring implements Scheduler {
                     if (i % totalnodes == 0) {
                         diff_byte = (byte) (diff_byte - (cs_byte * totalnodes));
                     }
-                    result.add(new ParallelForSENP(lower, upper,"",chunksize));
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
                 case 1:
                     cs_short = (short) Math.ceil((double) diff_short / (double) (2 * totalnodes));
@@ -177,7 +179,7 @@ public class Factoring implements Scheduler {
                         }
 
                         lower = "" + (low_short);
-                        up_short = (short) (low_short - cs_short );
+                        up_short = (short) (low_short - cs_short);
                         upper = "" + (up_short);
 
                         if (lupper_short <= max_short) {
@@ -199,7 +201,7 @@ public class Factoring implements Scheduler {
                         }
                         lower = "" + (low_short);
 
-                        up_short = (short) (low_short + cs_short );
+                        up_short = (short) (low_short + cs_short);
                         upper = "" + (up_short);
                         if (up_short >= max_short) {
                             upper = "" + (max_short);
@@ -211,7 +213,7 @@ public class Factoring implements Scheduler {
                     if (i % totalnodes == 0) {
                         diff_short = (short) (diff_short - (cs_short * totalnodes));
                     }
-                    result.add(new ParallelForSENP(lower, upper,"",chunksize));
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
                 case 2:
                     cs_int = (int) Math.ceil((double) diff_int / (double) (2 * totalnodes));
@@ -230,7 +232,7 @@ public class Factoring implements Scheduler {
                         }
 
                         lower = "" + (low_int);
-                        up_int = (int) (low_int - cs_int );
+                        up_int = (int) (low_int - cs_int);
                         upper = "" + (up_int);
 
                         if (lupper_int <= max_int) {
@@ -252,7 +254,7 @@ public class Factoring implements Scheduler {
                         }
                         lower = "" + (low_int);
 
-                        up_int = (int) (low_int + cs_int );
+                        up_int = (int) (low_int + cs_int);
                         upper = "" + (up_int);
                         if (up_int >= max_int) {
                             upper = "" + (max_int);
@@ -264,7 +266,7 @@ public class Factoring implements Scheduler {
                     if (i % totalnodes == 0) {
                         diff_int = (int) (diff_int - (cs_int * totalnodes));
                     }
-                    result.add(new ParallelForSENP(lower, upper,"",chunksize));
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
                 case 3:
                     cs_long = (long) Math.ceil((double) diff_long / ((double) 2 * totalnodes));
@@ -283,7 +285,7 @@ public class Factoring implements Scheduler {
                         }
 
                         lower = "" + (low_long);
-                        up_long = (long) (low_long - cs_long );
+                        up_long = (long) (low_long - cs_long);
                         upper = "" + (up_long);
 
                         if (lupper_long <= max_long) {
@@ -305,7 +307,7 @@ public class Factoring implements Scheduler {
                         }
                         lower = "" + (low_long);
 
-                        up_long = (long) (low_long + cs_long );
+                        up_long = (long) (low_long + cs_long);
                         upper = "" + (up_long);
                         if (up_long >= max_long) {
                             upper = "" + (max_long);
@@ -317,7 +319,7 @@ public class Factoring implements Scheduler {
                     if (i % totalnodes == 0) {
                         diff_long = (long) (diff_long - (cs_long * totalnodes));
                     }
-                    result.add(new ParallelForSENP(lower, upper,"",chunksize));
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
                 case 4:
                     cs_float = (float) Math.ceil((double) diff_float / (double) (2 * totalnodes));
@@ -336,7 +338,7 @@ public class Factoring implements Scheduler {
                         }
 
                         lower = "" + (low_float);
-                        up_float = (float) (low_float - cs_float );
+                        up_float = (float) (low_float - cs_float);
                         upper = "" + (up_float);
 
                         if (lupper_float <= max_float) {
@@ -358,7 +360,7 @@ public class Factoring implements Scheduler {
                         }
                         lower = "" + (low_float);
 
-                        up_float = (float) (low_float + cs_float );
+                        up_float = (float) (low_float + cs_float);
                         upper = "" + (up_float);
                         if (up_float >= max_float) {
                             upper = "" + (max_float);
@@ -370,7 +372,7 @@ public class Factoring implements Scheduler {
                     if (i % totalnodes == 0) {
                         diff_float = (float) (diff_float - (cs_float * totalnodes));
                     }
-                    result.add(new ParallelForSENP(lower, upper,"",chunksize));
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
                 case 5:
                     cs_double = (double) Math.ceil((double) diff_double / (double) (2 * totalnodes));
@@ -389,7 +391,7 @@ public class Factoring implements Scheduler {
                         }
 
                         lower = "" + (low_double);
-                        up_double = (double) (low_double - cs_double );
+                        up_double = (double) (low_double - cs_double);
                         upper = "" + (up_double);
 
                         if (lupper_double <= max_double) {
@@ -411,7 +413,7 @@ public class Factoring implements Scheduler {
                         }
                         lower = "" + (low_double);
 
-                        up_double = (double) (low_double + cs_double );
+                        up_double = (double) (low_double + cs_double);
                         upper = "" + (up_double);
                         if (up_double >= max_double) {
                             upper = "" + (max_double);
@@ -423,7 +425,7 @@ public class Factoring implements Scheduler {
                     if (i % totalnodes == 0) {
                         diff_double = (double) (diff_double - (cs_double * totalnodes));
                     }
-                    result.add(new ParallelForSENP(lower, upper,"",chunksize));
+                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
                     break;
             }
             i++;
@@ -438,11 +440,18 @@ public class Factoring implements Scheduler {
             i++;
         }
         this.nodes = nodesList.size();
+        backupNodes.addAll(nodesList);
+
         return result;
     }
 
     @Override
     public int getTotalNodes() {
         return this.nodes;
+    }
+
+    @Override
+    public ArrayList<Node> getBackupNodes() {
+        return backupNodes;
     }
 }
