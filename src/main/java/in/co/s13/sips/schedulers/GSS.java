@@ -433,4 +433,9 @@ public class GSS implements Scheduler {
     public ArrayList<Node> getBackupNodes() {
         return backupNodes;
     }
+
+    @Override
+    public int getTotalChunks() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

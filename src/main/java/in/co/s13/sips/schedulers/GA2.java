@@ -440,6 +440,11 @@ public class GA2 implements Scheduler {
         return backupNodes;
     }
 
+    @Override
+    public int getTotalChunks() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     private class Chromosome<T> {
 
         private ArrayList<T> elements = new ArrayList<>();
