@@ -29,7 +29,7 @@ import org.json.JSONObject;
 
 public class Chunk implements Scheduler {
 
-    private int nodes;
+    private int nodes, totalChunks;
     private ArrayList<Node> backupNodes = new ArrayList<>();
 
     @Override
@@ -130,7 +130,7 @@ public class Chunk implements Scheduler {
                         }
 
                     }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid(), chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, get.getUuid(), chunksize));
                     break;
                 case 1:
                     chunksize = "" + diff_short / totalnodes;
@@ -159,7 +159,7 @@ public class Chunk implements Scheduler {
                         }
 
                     }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid(), chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, get.getUuid(), chunksize));
                     break;
                 case 2:
                     chunksize = "" + diff_int / totalnodes;
@@ -188,7 +188,7 @@ public class Chunk implements Scheduler {
                         }
 
                     }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid(), chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, get.getUuid(), chunksize));
                     break;
                 case 3:
 
@@ -217,7 +217,7 @@ public class Chunk implements Scheduler {
                             upper = "" + (min_long + up_long);
                         }
                     }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid(), chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, get.getUuid(), chunksize));
                     break;
                 case 4:
                     chunksize = "" + diff_float / totalnodes;
@@ -245,7 +245,7 @@ public class Chunk implements Scheduler {
                         }
 
                     }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid(), chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, get.getUuid(), chunksize));
                     break;
                 case 5:
                     chunksize = "" + diff_double / totalnodes;
@@ -274,7 +274,7 @@ public class Chunk implements Scheduler {
                         }
 
                     }
-                    result.add(new ParallelForSENP(lower, upper, get.getUuid(), chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, get.getUuid(), chunksize));
                     break;
 
             }
@@ -282,7 +282,7 @@ public class Chunk implements Scheduler {
         }
         this.nodes = nodes.size();
         backupNodes.addAll(nodes);
-
+        totalChunks = result.size();
         return result;
     }
 
@@ -298,7 +298,7 @@ public class Chunk implements Scheduler {
 
     @Override
     public int getTotalChunks() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return totalChunks;
     }
 
 }

@@ -29,7 +29,7 @@ import org.json.JSONObject;
 
 public class TSS implements Scheduler {
 
-    private int nodes;
+    private int nodes, totalChunks;
     private ArrayList<Node> backupNodes = new ArrayList<>();
 
     @Override
@@ -164,7 +164,7 @@ public class TSS implements Scheduler {
                         diff_byte = (byte) (diff_byte - (cs_byte * totalnodes));
                     }
                     lupper_byte = up_byte;
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
                 case 1:
                     if (i == 1) {
@@ -223,7 +223,7 @@ public class TSS implements Scheduler {
                         diff_short = (short) (diff_short - (cs_short * totalnodes));
                     }
                     lupper_short = up_short;
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
                 case 2:
 
@@ -283,7 +283,7 @@ public class TSS implements Scheduler {
                         diff_int = (int) (diff_int - (cs_int * totalnodes));
                     }
                     lupper_int = up_int;
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
                 case 3:
 
@@ -343,7 +343,7 @@ public class TSS implements Scheduler {
                         diff_long = (long) (diff_long - (cs_long * totalnodes));
                     }
                     lupper_long = up_long;
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
                 case 4:
 
@@ -403,7 +403,7 @@ public class TSS implements Scheduler {
                         diff_float = (float) (diff_float - (cs_float * totalnodes));
                     }
                     lupper_float = up_float;
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
                 case 5:
 
@@ -463,7 +463,7 @@ public class TSS implements Scheduler {
                         diff_double = (double) (diff_double - (cs_double * totalnodes));
                     }
                     lupper_double = up_double;
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
             }
             i++;
@@ -479,6 +479,7 @@ public class TSS implements Scheduler {
         }
         this.nodes = nodes.size();
         backupNodes.addAll(nodes);
+        totalChunks = result.size();
         return result;
     }
 
@@ -494,6 +495,6 @@ public class TSS implements Scheduler {
 
     @Override
     public int getTotalChunks() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return totalChunks;
     }
 }

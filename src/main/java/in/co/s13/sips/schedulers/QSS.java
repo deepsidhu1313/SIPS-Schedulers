@@ -29,7 +29,7 @@ import org.json.JSONObject;
 
 public class QSS implements Scheduler {
 
-    private int nodes;
+    private int nodes, totalChunks;
     private ArrayList<Node> backupNodes = new ArrayList<>();
 
     @Override
@@ -168,7 +168,7 @@ public class QSS implements Scheduler {
                         lupper_byte = up_byte;
 
                     }
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
                 case 1:
                     if (i == 1) {
@@ -234,7 +234,7 @@ public class QSS implements Scheduler {
                         lupper_short = up_short;
 
                     }
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
                 case 2:
                     if (i == 1) {
@@ -301,7 +301,7 @@ public class QSS implements Scheduler {
                         lupper_int = up_int;
 
                     }
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
                 case 3:
 
@@ -370,7 +370,7 @@ public class QSS implements Scheduler {
                         lupper_long = up_long;
 
                     }
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
                 case 4:
 
@@ -438,7 +438,7 @@ public class QSS implements Scheduler {
                         lupper_float = up_float;
 
                     }
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
                 case 5:
 
@@ -506,7 +506,7 @@ public class QSS implements Scheduler {
                         lupper_double = up_double;
 
                     }
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
 
             }
@@ -523,7 +523,7 @@ public class QSS implements Scheduler {
         }
         this.nodes = nodes.size();
         backupNodes.addAll(nodes);
-
+        totalChunks = result.size();
         return result;
     }
 
@@ -539,6 +539,6 @@ public class QSS implements Scheduler {
 
     @Override
     public int getTotalChunks() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return totalChunks;
     }
 }

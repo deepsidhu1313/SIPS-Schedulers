@@ -214,7 +214,7 @@ public class GA implements Scheduler {
                         lower = "" + low_byte;
                         upper = "" + up_byte;
                         chunksize = "" + chunkFactor_byte;
-                        elements.add(new ParallelForSENP(lower, upper, randomlySelectedNode.getUuid(), chunksize));
+                        elements.add(new ParallelForSENP(j,lower, upper, randomlySelectedNode.getUuid(), chunksize));
                         break;
                     case 1:
                         chunkFactor_short = (short) ((short) (randomlySelectedNode.getCPUScore() / maxCPUScore) * (max_cs_short));
@@ -252,7 +252,7 @@ public class GA implements Scheduler {
                         lower = "" + low_short;
                         upper = "" + up_short;
                         chunksize = "" + chunkFactor_short;
-                        elements.add(new ParallelForSENP(lower, upper, randomlySelectedNode.getUuid(), chunksize));
+                        elements.add(new ParallelForSENP(j,lower, upper, randomlySelectedNode.getUuid(), chunksize));
                         break;
                     case 2:
                         chunkFactor_int = (int) ((randomlySelectedNode.getCPUScore() / maxCPUScore) * (max_cs_int));
@@ -289,7 +289,7 @@ public class GA implements Scheduler {
                         lower = "" + low_int;
                         upper = "" + up_int;
                         chunksize = "" + chunkFactor_int;
-                        elements.add(new ParallelForSENP(lower, upper, randomlySelectedNode.getUuid(), chunksize));
+                        elements.add(new ParallelForSENP(j,lower, upper, randomlySelectedNode.getUuid(), chunksize));
                         break;
                     case 3:
                         chunkFactor_long = (long) ((randomlySelectedNode.getCPUScore() / maxCPUScore) * (max_cs_long));
@@ -326,7 +326,7 @@ public class GA implements Scheduler {
                         lower = "" + low_long;
                         upper = "" + up_long;
                         chunksize = "" + chunkFactor_long;
-                        elements.add(new ParallelForSENP(lower, upper, randomlySelectedNode.getUuid(), chunksize));
+                        elements.add(new ParallelForSENP(j,lower, upper, randomlySelectedNode.getUuid(), chunksize));
                         break;
                     case 4:
                         chunkFactor_float = (float) ((randomlySelectedNode.getCPUScore() / maxCPUScore) * (max_cs_float));
@@ -363,7 +363,7 @@ public class GA implements Scheduler {
                         lower = "" + low_float;
                         upper = "" + up_float;
                         chunksize = "" + chunkFactor_float;
-                        elements.add(new ParallelForSENP(lower, upper, randomlySelectedNode.getUuid(), chunksize));
+                        elements.add(new ParallelForSENP(j,lower, upper, randomlySelectedNode.getUuid(), chunksize));
                         break;
                     case 5:
                         chunkFactor_double = (double) ((randomlySelectedNode.getCPUScore() / maxCPUScore) * (max_cs_double));
@@ -400,7 +400,7 @@ public class GA implements Scheduler {
                         lower = "" + low_double;
                         upper = "" + up_double;
                         chunksize = "" + chunkFactor_double;
-                        elements.add(new ParallelForSENP(lower, upper, randomlySelectedNode.getUuid(), chunksize));
+                        elements.add(new ParallelForSENP(j,lower, upper, randomlySelectedNode.getUuid(), chunksize));
                         break;
                 }
 

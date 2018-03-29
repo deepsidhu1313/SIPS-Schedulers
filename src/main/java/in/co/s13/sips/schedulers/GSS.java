@@ -34,7 +34,7 @@ import org.json.JSONObject;
  */
 public class GSS implements Scheduler {
 
-    private int nodes;
+    private int nodes, totalChunks;
     private ArrayList<Node> backupNodes = new ArrayList<>();
 
     @Override
@@ -157,7 +157,7 @@ public class GSS implements Scheduler {
                             lupper_byte = up_byte;
                             diff_byte = (byte) (diff_byte - cs_byte);
                         }
-                        result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                        result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                         break;
                     case 1:
                         cs_short = (short) Math.ceil((double) diff_short / (double) totalnodes);
@@ -206,7 +206,7 @@ public class GSS implements Scheduler {
                             lupper_short = up_short;
                             diff_short = (short) (diff_short - cs_short);
                         }
-                        result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                        result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                         break;
                     case 2:
                         cs_int = (int) Math.ceil((double) diff_int / (double) totalnodes);
@@ -255,7 +255,7 @@ public class GSS implements Scheduler {
                             lupper_int = up_int;
                             diff_int = (int) (diff_int - cs_int);
                         }
-                        result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                        result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                         break;
                     case 3:
                         cs_long = (long) Math.ceil((double) diff_long / (double) totalnodes);
@@ -304,7 +304,7 @@ public class GSS implements Scheduler {
                             lupper_long = up_long;
                             diff_long = (long) (diff_long - cs_long);
                         }
-                        result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                        result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                         break;
                     case 4:
                         cs_float = (float) Math.ceil((double) diff_float / (double) totalnodes);
@@ -353,7 +353,7 @@ public class GSS implements Scheduler {
                             lupper_float = up_float;
                             diff_float = (float) (diff_float - cs_float);
                         }
-                        result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                        result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                         break;
                     case 5:
                         cs_double = (double) Math.ceil((double) diff_double / (double) totalnodes);
@@ -402,7 +402,7 @@ public class GSS implements Scheduler {
                             lupper_double = up_double;
                             diff_double = (double) (diff_double - cs_double);
                         }
-                        result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                        result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                         break;
 
                 }
@@ -420,7 +420,7 @@ public class GSS implements Scheduler {
         }
         this.nodes = nodes.size();
         backupNodes.addAll(nodes);
-
+        totalChunks = result.size();
         return result;
     }
 
@@ -436,6 +436,6 @@ public class GSS implements Scheduler {
 
     @Override
     public int getTotalChunks() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return totalChunks;
     }
 }

@@ -35,7 +35,7 @@ import org.json.JSONObject;
  */
 public class Factoring implements Scheduler {
 
-    private int nodes;
+    private int nodes, totalChunks;
     private ArrayList<Node> backupNodes = new ArrayList<>();
 
     @Override
@@ -160,7 +160,7 @@ public class Factoring implements Scheduler {
                     if (i % totalnodes == 0) {
                         diff_byte = (byte) (diff_byte - (cs_byte * totalnodes));
                     }
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
                 case 1:
                     cs_short = (short) Math.ceil((double) diff_short / (double) (2 * totalnodes));
@@ -213,7 +213,7 @@ public class Factoring implements Scheduler {
                     if (i % totalnodes == 0) {
                         diff_short = (short) (diff_short - (cs_short * totalnodes));
                     }
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
                 case 2:
                     cs_int = (int) Math.ceil((double) diff_int / (double) (2 * totalnodes));
@@ -266,7 +266,7 @@ public class Factoring implements Scheduler {
                     if (i % totalnodes == 0) {
                         diff_int = (int) (diff_int - (cs_int * totalnodes));
                     }
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
                 case 3:
                     cs_long = (long) Math.ceil((double) diff_long / ((double) 2 * totalnodes));
@@ -319,7 +319,7 @@ public class Factoring implements Scheduler {
                     if (i % totalnodes == 0) {
                         diff_long = (long) (diff_long - (cs_long * totalnodes));
                     }
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
                 case 4:
                     cs_float = (float) Math.ceil((double) diff_float / (double) (2 * totalnodes));
@@ -372,7 +372,7 @@ public class Factoring implements Scheduler {
                     if (i % totalnodes == 0) {
                         diff_float = (float) (diff_float - (cs_float * totalnodes));
                     }
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
                 case 5:
                     cs_double = (double) Math.ceil((double) diff_double / (double) (2 * totalnodes));
@@ -425,7 +425,7 @@ public class Factoring implements Scheduler {
                     if (i % totalnodes == 0) {
                         diff_double = (double) (diff_double - (cs_double * totalnodes));
                     }
-                    result.add(new ParallelForSENP(lower, upper, "", chunksize));
+                    result.add(new ParallelForSENP(i - 1, lower, upper, "", chunksize));
                     break;
             }
             i++;
@@ -441,7 +441,7 @@ public class Factoring implements Scheduler {
         }
         this.nodes = nodesList.size();
         backupNodes.addAll(nodesList);
-
+        totalChunks = result.size();
         return result;
     }
 
@@ -457,6 +457,6 @@ public class Factoring implements Scheduler {
 
     @Override
     public int getTotalChunks() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return totalChunks;
     }
 }

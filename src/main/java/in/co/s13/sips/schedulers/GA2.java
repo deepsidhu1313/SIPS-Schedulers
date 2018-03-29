@@ -173,7 +173,7 @@ public class GA2 implements Scheduler {
                         lower = "" + low_byte;
                         upper = "" + up_byte;
                         chunksize = "" + chunkFactor_byte;
-                        elements.add(new ParallelForSENP(lower, upper, get.getUuid(), chunksize));
+                        elements.add(new ParallelForSENP(j,lower, upper, get.getUuid(), chunksize));
                         break;
                     case 1:
                         chunkFactor_short = (short) ((short) (get.getCPUScore() / totalCPUScore) * (diff_short));
@@ -211,7 +211,7 @@ public class GA2 implements Scheduler {
                         lower = "" + low_short;
                         upper = "" + up_short;
                         chunksize = "" + chunkFactor_short;
-                        elements.add(new ParallelForSENP(lower, upper, get.getUuid(), chunksize));
+                        elements.add(new ParallelForSENP(j,lower, upper, get.getUuid(), chunksize));
                         break;
                     case 2:
                         chunkFactor_int = (int) ((get.getCPUScore() / totalCPUScore) * (diff_int));
@@ -248,7 +248,7 @@ public class GA2 implements Scheduler {
                         lower = "" + low_int;
                         upper = "" + up_int;
                         chunksize = "" + chunkFactor_int;
-                        elements.add(new ParallelForSENP(lower, upper, get.getUuid(), chunksize));
+                        elements.add(new ParallelForSENP(j,lower, upper, get.getUuid(), chunksize));
                         break;
                     case 3:
                         chunkFactor_long = (long) ((get.getCPUScore() / totalCPUScore) * (diff_long));
@@ -285,7 +285,7 @@ public class GA2 implements Scheduler {
                         lower = "" + low_long;
                         upper = "" + up_long;
                         chunksize = "" + chunkFactor_long;
-                        elements.add(new ParallelForSENP(lower, upper, get.getUuid(), chunksize));
+                        elements.add(new ParallelForSENP(j,lower, upper, get.getUuid(), chunksize));
                         break;
                     case 4:
                         chunkFactor_float = (float) ((get.getCPUScore() / totalCPUScore) * (diff_float));
@@ -322,7 +322,7 @@ public class GA2 implements Scheduler {
                         lower = "" + low_float;
                         upper = "" + up_float;
                         chunksize = "" + chunkFactor_float;
-                        elements.add(new ParallelForSENP(lower, upper, get.getUuid(), chunksize));
+                        elements.add(new ParallelForSENP(j,lower, upper, get.getUuid(), chunksize));
                         break;
                     case 5:
                         chunkFactor_double = (double) ((get.getCPUScore() / totalCPUScore) * (diff_double));
@@ -359,7 +359,7 @@ public class GA2 implements Scheduler {
                         lower = "" + low_double;
                         upper = "" + up_double;
                         chunksize = "" + chunkFactor_double;
-                        elements.add(new ParallelForSENP(lower, upper, get.getUuid(), chunksize));
+                        elements.add(new ParallelForSENP(j,lower, upper, get.getUuid(), chunksize));
                         break;
                 }
 
