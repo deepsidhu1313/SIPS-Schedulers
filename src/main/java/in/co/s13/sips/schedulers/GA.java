@@ -376,38 +376,6 @@ public class GA implements Scheduler {
         }
     }
 
-    private void setDependecyQueue(Chromosome chromosome) {
-
-    }
-
-    private void setPreTasks(Chromosome chromosome) {
-        chromosome.processorsHM.values().forEach((proc) -> {
-            proc.getQue().forEach((t) -> {
-                ArrayList<Task> preTask = new ArrayList<>(proc.getQue().subList(0, proc.getQue().indexOf(t)));
-                t.getPretask().addAll(preTask);
-            });
-        });
-
-    }
-
-    private void calibrateTimes(Chromosome chromosome) {
-        for (int i = 0; i < chromosome.elements.size(); i++) {
-            Task get = chromosome.elements.get(i);
-            Processor processor = chromosome.processorsHM.get(get.getParallelForLoop().getNodeUUID());
-            long endTime = 0;
-            if (!get.getDeplist().isEmpty()) {
-                ArrayList<Task> duplicateList = new ArrayList<>();
-                Collections.copy(duplicateList, get.getDeplist());
-                Collections.sort(duplicateList, TaskComparator.END_TIME_SORT.reversed());
-                endTime = duplicateList.get(0).getEndtime();
-            }
-            get.setStarttime(endTime + processor.getTimeCounter() + processor.getDistanceFromCurrent() + 1);
-            get.setEndtime(get.getStarttime() + (long) Math.ceil(get.getValue()));
-            get.setExectime(get.getEndtime() - get.getStarttime());
-            processor.incrementTimeCounter(get.getExectime() + 1);
-        }
-
-    }
 
     private class Chromosome {
 
@@ -626,11 +594,7 @@ public class GA implements Scheduler {
             return "** Id of Task=" + id + ",  value=" + value + ", Depends On Tasks =" + deplist + ", preTasks are : " + pretask + " StartTime:" + starttime + " Endtime:" + endtime + " ExecTime:" + exectime + " **";
         }
 
-        public int compareTo(Object t) {
-            double compareProbFunc = ((Task) t).getValue();
-            /* For Ascending order*/
-            return Double.compare(compareProbFunc, this.value);
-        }
+       
 
     }
 
