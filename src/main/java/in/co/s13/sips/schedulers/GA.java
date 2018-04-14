@@ -44,12 +44,12 @@ public class GA implements Scheduler {
     Random rand = new Random();
     private int nodes, totalChunks;
     private ArrayList<Node> backupNodes = new ArrayList<>();
-
+    
     @Override
     public ArrayList<TaskNodePair> schedule() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
     @Override
     public ArrayList<ParallelForSENP> scheduleParallelFor(ConcurrentHashMap<String, Node> liveNodes, ParallelForLoop loop, JSONObject schedulerSettings) {
         ArrayList<ParallelForSENP> result = new ArrayList<>();
@@ -75,10 +75,10 @@ public class GA implements Scheduler {
             nodes = new ArrayList<>(nodes.subList(0, maxNodes));
         }
         Collections.sort(nodes, LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.reversed());
-
+        
         Node bestNode = nodes.get(0);
         double maxCPUScore = bestNode.getCPUScore();
-
+        
         int totalnodes = nodes.size();
 
         /**
@@ -88,7 +88,7 @@ public class GA implements Scheduler {
         double minExpectedTime = 1;
         ConcurrentHashMap<String, Processor> processors = new ConcurrentHashMap<>();
         processors.put(nodes.get(0).getUuid(), new Processor(nodes.get(0).getUuid(), availSlots, nodes.get(0).getCPUScore(), new ArrayList<Task>(), new ArrayList<>(), nodes.get(0).getDistanceFromCurrent(), maxCPUScore / nodes.get(0).getCPUScore()));
-
+        
         for (int i = 1; i < nodes.size(); i++) {
             Node get = nodes.get(i);
             availSlots += (get.getTask_limit() - get.getWaiting_in_que());
@@ -102,32 +102,27 @@ public class GA implements Scheduler {
             availSlots = maxNodes;
         }
         System.out.println("Max Score: " + maxCPUScore + " Min Expected Time:" + minExpectedTime);
-
+        
         byte diff_byte = 0, chunkFactor_byte;
         short diff_short = 0, chunkFactor_short;
         int diff_int = 0, chunkFactor_int;
         long diff_long = 0, chunkFactor_long;
         float diff_float = 0, chunkFactor_float;
         double diff_double = 0, chunkFactor_double;
-
+        
         boolean chunksCreated = false;
         int i = 1;
         TSS tss = new TSS();
         result = tss.scheduleParallelFor(liveNodes, loop, schedulerSettings);
         i = 0;
-        Chromosome resultant = null;
-        ArrayList<LiveNode.LiveNodeComparator> comparators = new ArrayList<>();
-        comparators.add(LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE);
-        comparators.add(LiveNode.LiveNodeComparator.CPU_AVG_LOAD);
-        comparators.add(LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT);
-        comparators.add(LiveNode.LiveNodeComparator.HDD_READ_SPEED);
-        comparators.add(LiveNode.LiveNodeComparator.HDD_WRITE_SPEED);
-        comparators.add(LiveNode.LiveNodeComparator.RAM_FREE);
-        comparators.add(LiveNode.LiveNodeComparator.RAM);
-        comparators.add(LiveNode.LiveNodeComparator.QLEN);
+        Chromosome resultant = new Chromosome();
+        ArrayList<ProcessorComparator> comparators = new ArrayList<>();
+        comparators.add(ProcessorComparator.AVAIL_SLOTS_SORT);
+        comparators.add(ProcessorComparator.CPU_SCORE_SORT);
+        comparators.add(ProcessorComparator.DISTANCE_SORT);
+        comparators.add(ProcessorComparator.PF_SORT);
         ArrayList<Chromosome> chromosomes = new ArrayList<>();
-        LiveNode.LiveNodeComparator randomComparator = comparators.get(randInt(0, comparators.size()));
-
+        
         for (int r = 0; r < maxPopulation; r++) {
             chunkFactor_byte = 0;
             chunkFactor_short = 0;
@@ -135,16 +130,16 @@ public class GA implements Scheduler {
             chunkFactor_long = 0;
             chunkFactor_float = 0;
             chunkFactor_double = 0;
-
+            
             ArrayList<Task> elements = new ArrayList<>();
             ArrayList<Processor> processorsForSelection = new ArrayList<>();
             processors.values().forEach(value -> processorsForSelection.add(new Processor(value)));
-
+            ProcessorComparator randomComparator = comparators.get(randInt(0, comparators.size()));
+            Collections.sort(processorsForSelection, randomComparator);
             Chromosome chromosome = new Chromosome();
             chromosome.getProcessors().addAll(processorsForSelection);
             for (int j = 0; j < result.size(); j++) {
-                int randomSelectedIndex = randInt(0, processorsForSelection.size());
-                Processor randomlySelectedNode = processorsForSelection.get(randomSelectedIndex);
+                Processor randomlySelectedNode = getRandomProcessor(processorsForSelection, processors);
                 ParallelForSENP get = result.get(j);
                 switch (loop.getDataType()) {
                     case 0:
@@ -181,7 +176,7 @@ public class GA implements Scheduler {
                         duplicate_long.setNodeUUID(randomlySelectedNode.getId());
                         task_long.setParallelForLoop(duplicate_long);
                         randomlySelectedNode.getQue().add(task_long);
-
+                        
                         elements.add(task_long);
                         break;
                     case 4:
@@ -203,18 +198,15 @@ public class GA implements Scheduler {
                         elements.add(task_double);
                         break;
                 }
-                int remainingSlotsOnProcessor = randomlySelectedNode.getAvailSlots() - randomlySelectedNode.getQue().size();
-                if (remainingSlotsOnProcessor == 0) {
-                    processorsForSelection.remove(randomSelectedIndex);
-                }
+                
             }
             System.out.println("Elements:" + elements);
             chromosome.getElements().addAll(elements);
             chromosomes.add(chromosome);
         }
-
+        
         Chromosome chromosome1 = chromosomes.get(randInt(0, chromosomes.size()));
-
+        
         for (i = 0; i < maxGenerations; i++) {
             /**
              * *CrossOver**
@@ -267,7 +259,7 @@ public class GA implements Scheduler {
                 chromosome2.addElementsToHashMap();
                 reassignProcessorsAccToSlots(chromosome1);
                 reassignProcessorsAccToSlots(chromosome2);
-
+                
             }
 
             /**
@@ -287,6 +279,7 @@ public class GA implements Scheduler {
             task4Mutation.getParallelForLoop().setNodeUUID(processorsList.get(randomIndexOfProcessor).getId());
             resultant = forMutation;
         }
+        reassignProcessorsAccToSlots(resultant);
         System.out.println("Best Chromosome:" + resultant);
         this.totalChunks = resultant.getElements().size();
         this.nodes = (int) resultant.getProcessors().stream().filter(p -> p.getQue().size() > 0).count();
@@ -295,22 +288,38 @@ public class GA implements Scheduler {
         resultant.getElements().forEach(element -> result2.add(element.getParallelForLoop()));
         return result2;
     }
-
+    
     @Override
     public int getTotalNodes() {
         return this.nodes;
     }
-
+    
     @Override
     public ArrayList<Node> getBackupNodes() {
         return backupNodes;
     }
-
+    
     @Override
     public int getTotalChunks() {
         return this.totalChunks;
     }
-
+    
+    private Processor getRandomProcessor(ArrayList<Processor> processorsForSelection, ConcurrentHashMap<String, Processor> allNodes) {
+        if (!processorsForSelection.isEmpty()) {
+            int randomSelectedIndex = randInt(0, processorsForSelection.size());
+            Processor random = processorsForSelection.get(randomSelectedIndex);
+            int remainingSlotsOnProcessor = random.getAvailSlots() - random.getQue().size();
+            if (remainingSlotsOnProcessor == 0) {
+                processorsForSelection.remove(randomSelectedIndex);
+            }
+            return random;
+        } else {
+            ArrayList<Processor> otherOne = new ArrayList<>();
+            otherOne.addAll(allNodes.values());
+            return otherOne.get(randInt(0, otherOne.size()));
+        }
+    }
+    
     private Chromosome bestForMutation(Chromosome chromosome1, Chromosome chromosome2) {
         ArrayList<Processor> duplicateList = new ArrayList<>();
         Collections.copy(duplicateList, chromosome1.getProcessors());
@@ -326,13 +335,13 @@ public class GA implements Scheduler {
         } else {
             return chromosome2;
         }
-
+        
     }
-
+    
     private Processor getProcessorOrAnyOther(String id, ArrayList<Processor> processorsForSelection, Chromosome chromosome) {
         Processor processor = chromosome.getProcessorsHM().get(id);
         boolean notFound = true;
-        while (notFound) {
+        while (notFound && processorsForSelection.size() > 0) {
             int remainingSlotsOnProcessor = processor.getAvailSlots() - processor.getQue().size();
             if (remainingSlotsOnProcessor == 0) {
                 processorsForSelection.remove(processor);
@@ -346,9 +355,15 @@ public class GA implements Scheduler {
                 notFound = false;
             }
         }
+        if (notFound && processorsForSelection.size() < 1) {
+            ArrayList<Processor> otherOne = new ArrayList<>();
+            otherOne.addAll(chromosome.getProcessorsHM().values());
+            otherOne.get(randInt(0, otherOne.size()));
+        }
+        
         return processor;
     }
-
+    
     private void reassignProcessorsAccToSlots(Chromosome chromosome) {
         ArrayList<Processor> processorsForSelection = new ArrayList<>();
         processorsForSelection.addAll(chromosome.getProcessors());
@@ -361,7 +376,7 @@ public class GA implements Scheduler {
                 Task get1 = get.getDeplist().get(j);
                 processor.getDepque().add(get1);
             }
-
+            
             long endTime = 0;
             if (!get.getDeplist().isEmpty()) {
                 ArrayList<Task> duplicateList = new ArrayList<>();
@@ -369,54 +384,54 @@ public class GA implements Scheduler {
                 Collections.sort(duplicateList, TaskComparator.END_TIME_SORT.reversed());
                 endTime = duplicateList.get(0).getEndtime();
             }
+            get.getParallelForLoop().setNodeUUID(processor.getId());
             get.setStarttime(endTime + processor.getTimeCounter() + processor.getDistanceFromCurrent() + 1);
             get.setEndtime(get.getStarttime() + (long) Math.ceil(get.getValue()));
             get.setExectime(get.getEndtime() - get.getStarttime());
             processor.incrementTimeCounter(get.getEndtime() + 1);
         }
     }
-
-
+    
     private class Chromosome {
-
+        
         private ArrayList<Task> elements = new ArrayList<>();
         private ArrayList<Processor> processors = new ArrayList<>();
         private ConcurrentHashMap<String, Task> elementsHM = new ConcurrentHashMap<>();
         private ConcurrentHashMap<String, Processor> processorsHM = new ConcurrentHashMap<>();
         private long scheduleLength = 0;
-
+        
         public Chromosome(ArrayList<Task> elements, ArrayList<Processor> processors) {
             this.elements = elements;
             this.processors = processors;
         }
-
+        
         public Chromosome() {
         }
-
+        
         public ArrayList<Task> getElements() {
             return elements;
         }
-
+        
         public void setElements(ArrayList<Task> elements) {
             this.elements = elements;
         }
-
+        
         public ArrayList<Processor> getProcessors() {
             return processors;
         }
-
+        
         public void setProcessors(ArrayList<Processor> processors) {
             this.processors = processors;
         }
-
+        
         public long getScheduleLength() {
             return scheduleLength;
         }
-
+        
         public void setScheduleLength(long scheduleLength) {
             this.scheduleLength = scheduleLength;
         }
-
+        
         public void addElementsToHashMap() {
             elementsHM.clear();
             for (int i = 0; i < elements.size(); i++) {
@@ -428,40 +443,45 @@ public class GA implements Scheduler {
                 Processor get = processors.get(i);
                 processorsHM.put(get.getId(), get);
             }
-
+            
         }
-
+        
         public ConcurrentHashMap<String, Task> getElementsHM() {
             return elementsHM;
         }
-
+        
         public void setElementsHM(ConcurrentHashMap<String, Task> elementsHM) {
             this.elementsHM = elementsHM;
         }
-
+        
         public ConcurrentHashMap<String, Processor> getProcessorsHM() {
             return processorsHM;
         }
-
+        
         public void setProcessorsHM(ConcurrentHashMap<String, Processor> processorsHM) {
             this.processorsHM = processorsHM;
         }
-
+        
+        @Override
+        public String toString() {
+            return "Chromosome{" + "elements=" + elements + ", processors=" + processors + ", elementsHM=" + elementsHM + ", processorsHM=" + processorsHM + ", scheduleLength=" + scheduleLength + '}';
+        }
+        
     }
-
+    
     public static enum ChromosomeComparator implements Comparator<Chromosome> {
-
+        
         SCHEDULE_LENGTH_SORT {
             @Override
             public int compare(Chromosome o1, Chromosome o2) {
                 return Long.valueOf(o1.getScheduleLength()).compareTo(o2.getScheduleLength());
             }
         };
-
+        
         public static Comparator<Chromosome> decending(final Comparator<Chromosome> other) {
             return (Chromosome o1, Chromosome o2) -> -1 * other.compare(o1, o2);
         }
-
+        
         public static Comparator<Chromosome> getComparator(final ChromosomeComparator... multipleOptions) {
             return (Chromosome o1, Chromosome o2) -> {
                 for (ChromosomeComparator option : multipleOptions) {
@@ -490,12 +510,12 @@ public class GA implements Scheduler {
         // nextInt is normally exclusive of the top availSlots,
         // so add 1 to make it inclusive
         int randomNum = rand.nextInt((max - min) + 1) + min;
-
+        
         return randomNum;
     }
-
+    
     private class Task {
-
+        
         private String id;
         private double value;
         private long starttime;
@@ -504,7 +524,7 @@ public class GA implements Scheduler {
         private ArrayList<Task> deplist;
         private ArrayList<Task> pretask;
         private ParallelForSENP parallelForLoop;
-
+        
         public Task(String id, double value, long starttime, long endtime, long exectime, ArrayList<Task> deplist, ArrayList<Task> pretask) {
             this.id = id;
             this.value = value;
@@ -514,7 +534,7 @@ public class GA implements Scheduler {
             this.pretask = pretask;
             this.exectime = exectime;
         }
-
+        
         public Task(Task otherTask) {
             otherTask.id = this.id;
             otherTask.value = this.value;
@@ -524,82 +544,80 @@ public class GA implements Scheduler {
             otherTask.pretask = this.pretask;
             otherTask.exectime = this.exectime;
         }
-
+        
         public String getId() {
             return id;
         }
-
+        
         public void setId(String id) {
             this.id = id;
         }
-
+        
         public double getValue() {
             return value;
         }
-
+        
         public void setValue(double value) {
             this.value = value;
         }
-
+        
         public long getStarttime() {
             return starttime;
         }
-
+        
         public void setStarttime(long value) {
             this.starttime = value;
         }
-
+        
         public long getEndtime() {
             return endtime;
         }
-
+        
         public void setEndtime(long value) {
             this.endtime = value;
         }
-
+        
         public long getExectime() {
             return exectime;
         }
-
+        
         public void setExectime(long value) {
             this.exectime = value;
         }
-
+        
         public ArrayList<Task> getDeplist() {
             return deplist;
         }
-
+        
         public void setDeplist(ArrayList<Task> value) {
             this.deplist = value;
         }
-
+        
         public ArrayList<Task> getPretask() {
             return pretask;
         }
-
+        
         public void setPretask(ArrayList<Task> value) {
             this.pretask = value;
         }
-
+        
         public ParallelForSENP getParallelForLoop() {
             return parallelForLoop;
         }
-
+        
         public void setParallelForLoop(ParallelForSENP parallelForLoop) {
             this.parallelForLoop = parallelForLoop;
         }
-
+        
         @Override
         public String toString() {
-            return "** Id of Task=" + id + ",  value=" + value + ", Depends On Tasks =" + deplist + ", preTasks are : " + pretask + " StartTime:" + starttime + " Endtime:" + endtime + " ExecTime:" + exectime + " **";
+            return "Task{" + "id=" + id + ", value=" + value + ", starttime=" + starttime + ", endtime=" + endtime + ", exectime=" + exectime + ", deplist=" + deplist + ", pretask=" + pretask + ", parallelForLoop=" + parallelForLoop + '}';
         }
-
-       
-
+        
     }
-
+    
     private class Processor {
-
+        
         private String id;
         private int availSlots;
         private double CPUScore;
@@ -608,7 +626,7 @@ public class GA implements Scheduler {
         private ArrayList<Task> depque;
         private long timeCounter = 0;
         private long distanceFromCurrent = 0;
-
+        
         public Processor(String id, int availSlots, double cpuScore, ArrayList<Task> que, ArrayList<Task> depque, long distanceFromCurrent, double performanceFactor) {
             this.id = id;
             this.availSlots = availSlots;
@@ -618,7 +636,7 @@ public class GA implements Scheduler {
             this.distanceFromCurrent = distanceFromCurrent;
             this.performanceFactor = performanceFactor;
         }
-
+        
         public Processor(Processor otherProcessor) {
             otherProcessor.id = this.id;
             otherProcessor.availSlots = this.availSlots;
@@ -628,84 +646,84 @@ public class GA implements Scheduler {
             otherProcessor.distanceFromCurrent = distanceFromCurrent;
             otherProcessor.performanceFactor = performanceFactor;
         }
-
+        
         public String getId() {
             return id;
         }
-
+        
         public void setId(String id) {
             this.id = id;
         }
-
+        
         public int getAvailSlots() {
             return availSlots;
         }
-
+        
         public void setAvailSlots(int availSlots) {
             this.availSlots = availSlots;
         }
-
+        
         public ArrayList<Task> getQue() {
             return que;
         }
-
+        
         public void setQue(ArrayList<Task> value) {
             this.que = value;
         }
-
+        
         public ArrayList<Task> getDepque() {
             return depque;
         }
-
+        
         public void setDepque(ArrayList<Task> value) {
             this.depque = value;
         }
-
+        
         public double getCPUScore() {
             return CPUScore;
         }
-
+        
         public void setCPUScore(double CPUScore) {
             this.CPUScore = CPUScore;
         }
-
+        
         public long getTimeCounter() {
             return timeCounter;
         }
-
+        
         public long incrementTimeCounter(long delta) {
             return timeCounter += delta;
         }
-
+        
         public void setTimeCounter(long timeCounter) {
             this.timeCounter = timeCounter;
         }
-
+        
         public long getDistanceFromCurrent() {
             return distanceFromCurrent;
         }
-
+        
         public void setDistanceFromCurrent(long distanceFromCurrent) {
             this.distanceFromCurrent = distanceFromCurrent;
         }
-
+        
         public double getPerformanceFactor() {
             return performanceFactor;
         }
-
+        
         public void setPerformanceFactor(double performanceFactor) {
             this.performanceFactor = performanceFactor;
         }
-
+        
         @Override
         public String toString() {
-            return "** Id of Processor=" + id + " with fitness value=" + availSlots + " **";
+            return "Processor{" + "id=" + id + ", availSlots=" + availSlots + ", CPUScore=" + CPUScore + ", performanceFactor=" + performanceFactor + ", que=" + que + ", depque=" + depque + ", timeCounter=" + timeCounter + ", distanceFromCurrent=" + distanceFromCurrent + '}';
         }
-
+        
     }
-
+    
     public static enum ProcessorComparator implements Comparator<Processor> {
-
+        
         CPU_SCORE_SORT {
             @Override
             public int compare(Processor o1, Processor o2) {
@@ -742,11 +760,11 @@ public class GA implements Scheduler {
                 return Double.valueOf(o1.getPerformanceFactor()).compareTo(o2.getPerformanceFactor());
             }
         };
-
+        
         public static Comparator<Processor> decending(final Comparator<Processor> other) {
             return (Processor o1, Processor o2) -> -1 * other.compare(o1, o2);
         }
-
+        
         public static Comparator<Processor> getComparator(final ProcessorComparator... multipleOptions) {
             return (Processor o1, Processor o2) -> {
                 for (ProcessorComparator option : multipleOptions) {
@@ -758,11 +776,11 @@ public class GA implements Scheduler {
                 return 0;
             };
         }
-
+        
     }
-
+    
     public static enum TaskComparator implements Comparator<Task> {
-
+        
         VALUE_SORT {
             @Override
             public int compare(Task o1, Task o2) {
@@ -794,11 +812,11 @@ public class GA implements Scheduler {
                 return Integer.valueOf(o1.getDeplist().size()).compareTo(o2.getDeplist().size());
             }
         };
-
+        
         public static Comparator<Task> decending(final Comparator<Task> other) {
             return (Task o1, Task o2) -> -1 * other.compare(o1, o2);
         }
-
+        
         public static Comparator<Task> getComparator(final TaskComparator... multipleOptions) {
             return (Task o1, Task o2) -> {
                 for (TaskComparator option : multipleOptions) {
@@ -810,7 +828,7 @@ public class GA implements Scheduler {
                 return 0;
             };
         }
-
+        
     }
-
+    
 }
