@@ -16,10 +16,148 @@
  */
 package in.co.s13.sips.schedulers.lib.ga;
 
+import in.co.s13.sips.lib.ParallelForSENP;
+import java.util.ArrayList;
+import java.util.Comparator;
+
 /**
  *
  * @author nika
  */
 public class Task {
-    
+
+    private String id;
+    private double value;
+    private long starttime;
+    private long endtime;
+    private long exectime;
+    private ArrayList<Task> deplist = new ArrayList<>();
+    private ParallelForSENP parallelForLoop;
+
+    public Task(String id, double value, long starttime, long endtime, long exectime, ArrayList<Task> deplist) {
+        this.id = id;
+        this.value = value;
+        this.starttime = starttime;
+        this.endtime = endtime;
+        this.deplist = deplist;
+        this.exectime = exectime;
+    }
+
+    public Task(Task otherTask) {
+        this.id = otherTask.id;
+        this.value = otherTask.value;
+        this.starttime = otherTask.starttime;
+        this.endtime = otherTask.endtime;
+        this.deplist = otherTask.deplist;
+        this.exectime = otherTask.exectime;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public double getValue() {
+        return value;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
+    }
+
+    public long getStarttime() {
+        return starttime;
+    }
+
+    public void setStarttime(long value) {
+        this.starttime = value;
+    }
+
+    public long getEndtime() {
+        return endtime;
+    }
+
+    public void setEndtime(long value) {
+        this.endtime = value;
+    }
+
+    public long getExectime() {
+        return exectime;
+    }
+
+    public void setExectime(long value) {
+        this.exectime = value;
+    }
+
+    public ArrayList<Task> getDeplist() {
+        return deplist;
+    }
+
+    public void setDeplist(ArrayList<Task> value) {
+        this.deplist = value;
+    }
+
+    public ParallelForSENP getParallelForLoop() {
+        return parallelForLoop;
+    }
+
+    public void setParallelForLoop(ParallelForSENP parallelForLoop) {
+        this.parallelForLoop = parallelForLoop;
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" + "id=" + id + ", value=" + value + ", starttime=" + starttime + ", endtime=" + endtime + ", exectime=" + exectime + ", deplist=" + deplist + ", parallelForLoop=" + parallelForLoop + '}';
+    }
+
+    public static enum TaskComparator implements Comparator<Task> {
+
+        VALUE_SORT {
+            @Override
+            public int compare(Task o1, Task o2) {
+                return Double.valueOf(o1.getValue()).compareTo(o2.getValue());
+            }
+        }, START_TIME_SORT {
+            @Override
+            public int compare(Task o1, Task o2) {
+                return Long.valueOf(o1.getStarttime()).compareTo(o2.getStarttime());
+            }
+        }, END_TIME_SORT {
+            @Override
+            public int compare(Task o1, Task o2) {
+                return Long.valueOf(o1.getEndtime()).compareTo(o2.getEndtime());
+            }
+        }, EXC_TIME_SORT {
+            @Override
+            public int compare(Task o1, Task o2) {
+                return Long.valueOf(o1.getExectime()).compareTo(o2.getExectime());
+            }
+        },
+        DEP_LIST_SIZE_SORT {
+            @Override
+            public int compare(Task o1, Task o2) {
+                return Integer.valueOf(o1.getDeplist().size()).compareTo(o2.getDeplist().size());
+            }
+        };
+
+        public static Comparator<Task> decending(final Comparator<Task> other) {
+            return (Task o1, Task o2) -> -1 * other.compare(o1, o2);
+        }
+
+        public static Comparator<Task> getComparator(final TaskComparator... multipleOptions) {
+            return (Task o1, Task o2) -> {
+                for (TaskComparator option : multipleOptions) {
+                    int result = option.compare(o1, o2);
+                    if (result != 0) {
+                        return result;
+                    }
+                }
+                return 0;
+            };
+        }
+
+    }
 }
