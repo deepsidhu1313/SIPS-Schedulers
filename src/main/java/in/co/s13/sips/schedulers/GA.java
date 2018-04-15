@@ -23,6 +23,7 @@ import in.co.s13.sips.lib.common.datastructure.Node;
 import in.co.s13.sips.lib.common.datastructure.ParallelForLoop;
 import in.co.s13.sips.scheduler.Scheduler;
 import in.co.s13.sips.schedulers.lib.ga.Chromosome;
+import in.co.s13.sips.schedulers.lib.ga.PairCPHM;
 import in.co.s13.sips.schedulers.lib.ga.Processor;
 import in.co.s13.sips.schedulers.lib.ga.Processor.ProcessorComparator;
 import in.co.s13.sips.schedulers.lib.ga.Task;
@@ -427,48 +428,7 @@ public class GA implements Scheduler {
 
     }
 
-    private class PairCPHM {
-
-        Processor processor;
-        Chromosome chromosome;
-        ArrayList<Processor> processors;
-
-        public PairCPHM(Processor processor, Chromosome chromosome, ArrayList<Processor> processors) {
-            this.processor = processor;
-            this.chromosome = chromosome;
-            this.processors = processors;
-        }
-
-        public Chromosome getChromosome() {
-            return chromosome;
-        }
-
-        public void setChromosome(Chromosome chromosome) {
-            this.chromosome = chromosome;
-        }
-
-        public ArrayList<Processor> getProcessors() {
-            return processors;
-        }
-
-        public void setProcessors(ArrayList<Processor> processors) {
-            this.processors = processors;
-        }
-
-        public Processor getProcessor() {
-            return processor;
-        }
-
-        public void setProcessor(Processor processor) {
-            this.processor = processor;
-        }
-
-        @Override
-        public String toString() {
-            return "PairCPHM{" + "processor=" + processor + ", chromosome=" + chromosome + ", processors=" + processors + '}';
-        }
-
-    }
+ 
 
     
 
