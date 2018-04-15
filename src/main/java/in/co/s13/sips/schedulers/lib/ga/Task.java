@@ -27,20 +27,21 @@ import java.util.Comparator;
 public class Task {
 
     private String id;
-    private double value;
+    private double value, problemSize;
     private long starttime;
     private long endtime;
     private long exectime;
     private ArrayList<Task> deplist = new ArrayList<>();
     private ParallelForSENP parallelForLoop;
 
-    public Task(String id, double value, long starttime, long endtime, long exectime, ArrayList<Task> deplist) {
+    public Task(String id, double value, long starttime, long endtime, long exectime, ArrayList<Task> deplist, double problemSize) {
         this.id = id;
         this.value = value;
         this.starttime = starttime;
         this.endtime = endtime;
         this.deplist = deplist;
         this.exectime = exectime;
+        this.problemSize = problemSize;
     }
 
     public Task(Task otherTask) {
@@ -50,6 +51,7 @@ public class Task {
         this.endtime = otherTask.endtime;
         this.deplist = otherTask.deplist;
         this.exectime = otherTask.exectime;
+        this.problemSize = otherTask.problemSize;
     }
 
     public String getId() {
@@ -107,6 +109,16 @@ public class Task {
     public void setParallelForLoop(ParallelForSENP parallelForLoop) {
         this.parallelForLoop = parallelForLoop;
     }
+
+    public double getProblemSize() {
+        return problemSize;
+    }
+
+    public void setProblemSize(double problemSize) {
+        this.problemSize = problemSize;
+    }
+    
+    
 
     @Override
     public String toString() {
