@@ -29,7 +29,7 @@ import org.json.JSONObject;
 
 public class Chunk implements Scheduler {
 
-    private int nodes, totalChunks;
+    private int nodes, totalChunks, selectedNodes;
     private ArrayList<Node> backupNodes = new ArrayList<>();
 
     @Override
@@ -281,6 +281,7 @@ public class Chunk implements Scheduler {
 
         }
         this.nodes = nodes.size();
+        this.selectedNodes = nodes.size();
         backupNodes.addAll(nodes);
         totalChunks = result.size();
         return result;
@@ -299,6 +300,11 @@ public class Chunk implements Scheduler {
     @Override
     public int getTotalChunks() {
         return totalChunks;
+    }
+
+    @Override
+    public int getSelectedNodes() {
+        return selectedNodes;
     }
 
 }

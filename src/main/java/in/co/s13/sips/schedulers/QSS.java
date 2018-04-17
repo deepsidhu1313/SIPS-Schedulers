@@ -29,8 +29,13 @@ import org.json.JSONObject;
 
 public class QSS implements Scheduler {
 
-    private int nodes, totalChunks;
+    private int nodes, totalChunks, selectedNodes;
     private ArrayList<Node> backupNodes = new ArrayList<>();
+
+    @Override
+    public int getSelectedNodes() {
+        return selectedNodes;
+    }
 
     @Override
     public ArrayList<TaskNodePair> schedule() {
@@ -522,6 +527,7 @@ public class QSS implements Scheduler {
             i++;
         }
         this.nodes = nodes.size();
+        this.selectedNodes = nodes.size();
         backupNodes.addAll(nodes);
         totalChunks = result.size();
         return result;

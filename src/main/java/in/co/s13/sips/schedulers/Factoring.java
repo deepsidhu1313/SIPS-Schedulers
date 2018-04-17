@@ -35,8 +35,13 @@ import org.json.JSONObject;
  */
 public class Factoring implements Scheduler {
 
-    private int nodes, totalChunks;
+    private int nodes, totalChunks, selectedNodes;
     private ArrayList<Node> backupNodes = new ArrayList<>();
+
+    @Override
+    public int getSelectedNodes() {
+        return selectedNodes;
+    }
 
     @Override
     public ArrayList<TaskNodePair> schedule() {
@@ -440,6 +445,7 @@ public class Factoring implements Scheduler {
             i++;
         }
         this.nodes = nodesList.size();
+        this.selectedNodes = nodesList.size();
         backupNodes.addAll(nodesList);
         totalChunks = result.size();
         return result;

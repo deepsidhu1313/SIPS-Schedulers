@@ -130,11 +130,15 @@ public class Processor {
     public ArrayList<FreeSlot> getFreeSlots() {
         ArrayList<FreeSlot> result = new ArrayList<>();
         ArrayList<Task> queue = this.getQue();
+        System.out.println("Queue: " + queue);
         if (queue.size() > 1) {
             for (int i = 0; i < queue.size() - 1; i++) {
                 Task get = queue.get(i);
                 Task get1 = queue.get(i + 1);
-                result.add(new FreeSlot(get.getEndtime(), get1.getStarttime(), get1.getStarttime() - get.getEndtime()));
+                long diff = get1.getStarttime() - get.getEndtime();
+                if (diff > 0) {
+                    result.add(new FreeSlot(get.getEndtime(), get1.getStarttime(), diff));
+                }
             }
         } else if (queue.size() == 1) {
             Task get = queue.get(0);
