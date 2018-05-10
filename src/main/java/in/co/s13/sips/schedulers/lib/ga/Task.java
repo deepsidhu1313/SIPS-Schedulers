@@ -16,7 +16,7 @@
  */
 package in.co.s13.sips.schedulers.lib.ga;
 
-import in.co.s13.sips.lib.ParallelForSENP;
+import in.co.s13.sips.lib.common.datastructure.ParallelForSENP;
 import java.util.ArrayList;
 import java.util.Comparator;
 

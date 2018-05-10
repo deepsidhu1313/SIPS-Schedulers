@@ -16,8 +16,8 @@
  */
 package in.co.s13.sips.schedulers;
 
-import in.co.s13.sips.lib.ParallelForSENP;
-import in.co.s13.sips.lib.TaskNodePair;
+import in.co.s13.sips.lib.common.datastructure.ParallelForSENP;
+import in.co.s13.sips.lib.common.datastructure.SIPSTask;
 import in.co.s13.sips.lib.common.datastructure.LiveNode;
 import in.co.s13.sips.lib.common.datastructure.Node;
 import in.co.s13.sips.lib.common.datastructure.ParallelForLoop;
@@ -38,7 +38,7 @@ public class QSS implements Scheduler {
     }
 
     @Override
-    public ArrayList<TaskNodePair> schedule() {
+    public ArrayList<SIPSTask> schedule(ConcurrentHashMap<String, Node> nodes, ConcurrentHashMap<String, SIPSTask> tasks, JSONObject schedulerSettings) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -55,7 +55,7 @@ public class QSS implements Scheduler {
         int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
         double QSSLCFactor = schedulerSettings.getDouble("LCFactor", 0.001);
         double QSSdelta = schedulerSettings.getDouble("delta", 2.0);
-        if (maxNodes > 8) {
+        if (maxNodes > 1) {
             Node node = livenodes.get(in.co.s13.sips.lib.node.settings.GlobalValues.NODE_UUID);
             nodes.remove(node);
         }

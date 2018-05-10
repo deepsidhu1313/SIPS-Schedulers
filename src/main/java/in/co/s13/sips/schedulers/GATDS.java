@@ -16,8 +16,8 @@
  */
 package in.co.s13.sips.schedulers;
 
-import in.co.s13.sips.lib.ParallelForSENP;
-import in.co.s13.sips.lib.TaskNodePair;
+import in.co.s13.sips.lib.common.datastructure.ParallelForSENP;
+import in.co.s13.sips.lib.common.datastructure.SIPSTask;
 import in.co.s13.sips.lib.common.datastructure.Node;
 import in.co.s13.sips.lib.common.datastructure.ParallelForLoop;
 import in.co.s13.sips.scheduler.Scheduler;
@@ -45,7 +45,7 @@ public class GATDS implements Scheduler {
     }
 
     @Override
-    public ArrayList<TaskNodePair> schedule() {
+    public ArrayList<SIPSTask> schedule(ConcurrentHashMap<String, Node> nodes, ConcurrentHashMap<String, SIPSTask> tasks, JSONObject schedulerSettings) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -85,12 +85,12 @@ public class GATDS implements Scheduler {
         return this.totalChunks;
     }
 
-    private int getTaskLocationInQueue(Processor processor, long startTime) {
+    private int getTaskLocationInQueue(Processor processor, long endTime) {
         ArrayList<Task> queue = processor.getQue();
         for (int i = 0; i < queue.size(); i++) {
             Task get = queue.get(i);
-            if (startTime == get.getStarttime()) {
-                return i;
+            if (endTime == get.getEndtime()) {
+                return i + 1;
             }
         }
         return 0;
@@ -100,6 +100,11 @@ public class GATDS implements Scheduler {
 //        System.out.println("Duplicating Tasks");
         ArrayList<Processor> processors = new ArrayList<>();
         processors.addAll(chromosome.getProcessorsHM().values());
+        Collections.sort(processors, Processor.ProcessorComparator.TIME_COUNTER_SORT.reversed().thenComparing(Processor.ProcessorComparator.DISTANCE_SORT).thenComparing(Processor.ProcessorComparator.PF_SORT));
+        long maxTimeCounter = 0;
+        if (!processors.isEmpty()) {
+            maxTimeCounter = processors.get(0).getTimeCounter();
+        }
         for (int i = 0; i < chromosome.getElements().size(); i++) {
             Task get = chromosome.getElements().get(i);
             for (int j = 0; j < get.getDeplist().size(); j++) {
@@ -125,7 +130,24 @@ public class GATDS implements Scheduler {
                             dependencyTask.getParallelForLoop().addDuplicate(duplicateSENP.getNodeUUID() + "-" + duplicateSENP.getChunkNo());
                             duplicateSENP.setDuplicateOf(dependencyTask.getParallelForLoop().getNodeUUID() + "-" + dependencyTask.getParallelForLoop().getChunkNo());
                             duplicate.setParallelForLoop(duplicateSENP);
-                            processor.getQue().add(getTaskLocationInQueue(processor, freeSlot.getTo()), duplicate);
+                            processor.getQue().add(getTaskLocationInQueue(processor, freeSlot.getFrom()), duplicate);
+                            eligible = true;
+                        }
+                    }
+
+                    if (!eligible && processor.getTimeCounter() < maxTimeCounter) {
+                        long estimateExcTime = (long) (dependencyTask.getProblemSize() * processor.getPerformanceFactor());
+                        if (maxTimeCounter - processor.getTimeCounter() > estimateExcTime
+                                && depEndTime > processor.getTimeCounter() + estimateExcTime + processor.getDistanceFromCurrent()
+                                && dependencyTask.getExectime() > estimateExcTime + processor.getDistanceFromCurrent()
+                                && !dependencyTask.getParallelForLoop().getNodeUUID().equalsIgnoreCase(processor.getId())) {
+                            Task duplicate = new Task(dependencyTask.getId(), estimateExcTime, processor.getTimeCounter() + processor.getDistanceFromCurrent(), processor.getTimeCounter() + estimateExcTime, estimateExcTime, new ArrayList<Task>(), dependencyTask.getProblemSize());// dependencyTask.getParallelForLoop()
+                            ParallelForSENP duplicateSENP = new ParallelForSENP(dependencyTask.getParallelForLoop());
+                            duplicateSENP.setNodeUUID(processor.getId());
+                            dependencyTask.getParallelForLoop().addDuplicate(duplicateSENP.getNodeUUID() + "-" + duplicateSENP.getChunkNo());
+                            duplicateSENP.setDuplicateOf(dependencyTask.getParallelForLoop().getNodeUUID() + "-" + dependencyTask.getParallelForLoop().getChunkNo());
+                            duplicate.setParallelForLoop(duplicateSENP);
+                            processor.getQue().add(getTaskLocationInQueue(processor, processor.getTimeCounter()), duplicate);
                             eligible = true;
                         }
                     }
@@ -164,8 +186,24 @@ public class GATDS implements Scheduler {
 //                        System.out.println("Set deuplicate of");
                         duplicate.setParallelForLoop(duplicateSENP);
 //                        System.out.println("setting modified duplicate SENP");
-                        processor.getQue().add(getTaskLocationInQueue(processor, freeSlot.getTo()), duplicate);
+                        processor.getQue().add(getTaskLocationInQueue(processor, freeSlot.getFrom()), duplicate);
 //                        System.out.println("modified QUEUE");
+                        eligible = true;
+                    }
+                }
+                if (!eligible && processor.getTimeCounter() < maxTimeCounter) {
+                    long estimateExcTime = (long) (get.getProblemSize() * processor.getPerformanceFactor());
+                    if (maxTimeCounter - processor.getTimeCounter() > estimateExcTime
+                            && get.getEndtime() > processor.getTimeCounter() + estimateExcTime + processor.getDistanceFromCurrent()
+                            && get.getExectime() > estimateExcTime + processor.getDistanceFromCurrent()
+                            && !get.getParallelForLoop().getNodeUUID().equalsIgnoreCase(processor.getId())) {
+                        Task duplicate = new Task(get.getId(), estimateExcTime, processor.getTimeCounter() + processor.getDistanceFromCurrent(), processor.getTimeCounter() + estimateExcTime, estimateExcTime, new ArrayList<Task>(), get.getProblemSize());// dependencyTask.getParallelForLoop()
+                        ParallelForSENP duplicateSENP = new ParallelForSENP(get.getParallelForLoop());
+                        duplicateSENP.setNodeUUID(processor.getId());
+                        get.getParallelForLoop().addDuplicate(duplicateSENP.getNodeUUID() + "-" + duplicateSENP.getChunkNo());
+                        duplicateSENP.setDuplicateOf(get.getParallelForLoop().getNodeUUID() + "-" + get.getParallelForLoop().getChunkNo());
+                        duplicate.setParallelForLoop(duplicateSENP);
+                        processor.getQue().add(getTaskLocationInQueue(processor, processor.getTimeCounter()), duplicate);
                         eligible = true;
                     }
                 }

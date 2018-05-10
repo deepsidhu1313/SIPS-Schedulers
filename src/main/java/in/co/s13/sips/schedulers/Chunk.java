@@ -16,8 +16,8 @@
  */
 package in.co.s13.sips.schedulers;
 
-import in.co.s13.sips.lib.ParallelForSENP;
-import in.co.s13.sips.lib.TaskNodePair;
+import in.co.s13.sips.lib.common.datastructure.ParallelForSENP;
+import in.co.s13.sips.lib.common.datastructure.SIPSTask;
 import in.co.s13.sips.lib.common.datastructure.LiveNode;
 import in.co.s13.sips.lib.common.datastructure.Node;
 import in.co.s13.sips.lib.common.datastructure.ParallelForLoop;
@@ -33,8 +33,44 @@ public class Chunk implements Scheduler {
     private ArrayList<Node> backupNodes = new ArrayList<>();
 
     @Override
-    public ArrayList<TaskNodePair> schedule() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public ArrayList<SIPSTask> schedule(ConcurrentHashMap<String, Node> livenodes, ConcurrentHashMap<String, SIPSTask> tasks, JSONObject schedulerSettings) {
+        ArrayList<SIPSTask> result = new ArrayList<>();
+
+        ArrayList<Node> nodes = new ArrayList<>();
+        nodes.addAll(livenodes.values());
+
+        Collections.sort(nodes, LiveNode.LiveNodeComparator.QWAIT.thenComparing(LiveNode.LiveNodeComparator.QLEN.reversed()).thenComparing(LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.reversed()).thenComparing(LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT));
+        int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
+
+        if (maxNodes > 1) {
+            Node node = livenodes.get(in.co.s13.sips.lib.node.settings.GlobalValues.NODE_UUID);
+            nodes.remove(node);
+        }
+        if (maxNodes < nodes.size()) {
+            // select best nodes for scheduling
+            nodes = new ArrayList<>(nodes.subList(0, maxNodes));
+        }
+
+        ArrayList<SIPSTask> tasksList = new ArrayList<>(tasks.values());
+        Collections.sort(tasksList, SIPSTask.SIPSTaskComparator.ID);
+        int nodeCounter = 0;
+        for (int i = 0; i < tasksList.size(); i++) {
+            SIPSTask get = tasksList.get(i);
+            Node node = nodes.get(nodeCounter);
+            get.setNodeUUID(node.getUuid());
+            result.add(get);
+            nodeCounter++;
+            if (nodeCounter == nodes.size()) {
+                nodeCounter = 0;
+            }
+        }
+
+        this.nodes = nodes.size();
+        this.selectedNodes = nodes.size();
+        backupNodes.addAll(nodes);
+        totalChunks = result.size();
+        
+        return result;
     }
 
     @Override
@@ -49,7 +85,7 @@ public class Chunk implements Scheduler {
         System.out.println("After Sorting:" + nodes);
         int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
 
-        if (maxNodes > 8) {
+        if (maxNodes > 1) {
             Node node = livenodes.get(in.co.s13.sips.lib.node.settings.GlobalValues.NODE_UUID);
             nodes.remove(node);
         }

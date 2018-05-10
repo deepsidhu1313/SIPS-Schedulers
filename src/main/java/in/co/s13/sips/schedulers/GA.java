@@ -16,8 +16,8 @@
  */
 package in.co.s13.sips.schedulers;
 
-import in.co.s13.sips.lib.ParallelForSENP;
-import in.co.s13.sips.lib.TaskNodePair;
+import in.co.s13.sips.lib.common.datastructure.ParallelForSENP;
+import in.co.s13.sips.lib.common.datastructure.SIPSTask;
 import in.co.s13.sips.lib.common.datastructure.LiveNode;
 import in.co.s13.sips.lib.common.datastructure.Node;
 import in.co.s13.sips.lib.common.datastructure.ParallelForLoop;
@@ -28,16 +28,11 @@ import in.co.s13.sips.schedulers.lib.ga.Processor;
 import in.co.s13.sips.schedulers.lib.ga.Processor.ProcessorComparator;
 import in.co.s13.sips.schedulers.lib.ga.Task;
 import in.co.s13.sips.schedulers.lib.ga.Task.TaskComparator;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import org.json.JSONObject;
 
 /**
@@ -57,7 +52,7 @@ public class GA implements Scheduler {
     }
 
     @Override
-    public ArrayList<TaskNodePair> schedule() {
+    public ArrayList<SIPSTask> schedule(ConcurrentHashMap<String, Node> nodes, ConcurrentHashMap<String, SIPSTask> tasks, JSONObject schedulerSettings) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -76,7 +71,7 @@ public class GA implements Scheduler {
         int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
         int maxGenerations = schedulerSettings.getInt("MaxGenerations", 4);
         int maxPopulation = schedulerSettings.getInt("MaxPopulation", 8);
-        if (maxNodes > 8) {
+        if (maxNodes > 1) {
             Node node = liveNodes.get(in.co.s13.sips.lib.node.settings.GlobalValues.NODE_UUID);
             nodes.remove(node);
         }
