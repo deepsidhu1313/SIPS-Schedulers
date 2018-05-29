@@ -35,7 +35,7 @@ public class Chunk implements Scheduler {
     @Override
     public ArrayList<SIPSTask> schedule(ConcurrentHashMap<String, Node> livenodes, ConcurrentHashMap<String, SIPSTask> tasks, JSONObject schedulerSettings) {
         ArrayList<SIPSTask> result = new ArrayList<>();
-
+        System.out.println("Tasks: " + tasks.values());
         ArrayList<Node> nodes = new ArrayList<>();
         nodes.addAll(livenodes.values());
 
@@ -51,8 +51,9 @@ public class Chunk implements Scheduler {
             nodes = new ArrayList<>(nodes.subList(0, maxNodes));
         }
 
-        ArrayList<SIPSTask> tasksList = new ArrayList<>(tasks.values());
-        Collections.sort(tasksList, SIPSTask.SIPSTaskComparator.ID);
+        ArrayList<SIPSTask> tasksList =sortTasksAccordingToDependencies(tasks);
+//        System.out.println("UnSorted Tasks:" + tasksList);
+        System.out.println("Sorted Tasks:" + tasksList);
         int nodeCounter = 0;
         for (int i = 0; i < tasksList.size(); i++) {
             SIPSTask get = tasksList.get(i);
@@ -69,8 +70,42 @@ public class Chunk implements Scheduler {
         this.selectedNodes = nodes.size();
         backupNodes.addAll(nodes);
         totalChunks = result.size();
-        
+
         return result;
+    }
+
+    private ArrayList<SIPSTask> sortTasksAccordingToDependencies(ConcurrentHashMap<String, SIPSTask> tasks) {
+        ArrayList<SIPSTask> tasksList = new ArrayList<>(tasks.values());
+        System.out.println("UnSorted Tasks:" + tasksList);
+        Collections.sort(tasksList, SIPSTask.SIPSTaskComparator.NO_OF_DEPENDENCIES.thenComparing(SIPSTask.SIPSTaskComparator.ID));
+        for (int i = 0; i < tasksList.size(); i++) {
+            SIPSTask get = tasksList.get(i);
+            ArrayList<String> deps = get.getDependsOn();
+            for (int j = 0; j < deps.size(); j++) {
+                String get1 = deps.get(j);
+                SIPSTask dep = tasks.get(get1);
+                int depCurrentIndex = getTaskIndex(tasksList, dep);
+                int tasksCurrentIndex = getTaskIndex(tasksList, get);
+                if (depCurrentIndex > tasksCurrentIndex) {
+                    tasksList.remove(depCurrentIndex);
+                    tasksList.add(tasksCurrentIndex, dep);
+                    i = 0;
+                }
+            }
+
+        }
+
+        return tasksList;
+    }
+
+    private int getTaskIndex(ArrayList<SIPSTask> tasksList, SIPSTask task) {
+        for (int i = 0; i < tasksList.size(); i++) {
+            SIPSTask get = tasksList.get(i);
+            if (get.equals(task)) {
+                return i;
+            }
+        }
+        return 0;
     }
 
     @Override

@@ -56,6 +56,95 @@ public class GA implements Scheduler {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    public Chromosome getBestChromosomeForTasks(ConcurrentHashMap<String, Node> liveNodes, ConcurrentHashMap<String, SIPSTask> tasks, JSONObject schedulerSettings) {
+        ArrayList<ParallelForSENP> result = new ArrayList<>();
+        ArrayList<Node> nodes = new ArrayList<>();
+        nodes.addAll(liveNodes.values());
+//        System.out.println("Before Sorting:" + nodes);
+
+        /**
+         ** Selection
+         */
+        // first sort score in decending order, then distance in ascending order
+        Collections.sort(nodes, LiveNode.LiveNodeComparator.QWAIT.thenComparing(LiveNode.LiveNodeComparator.QLEN.reversed()).thenComparing(LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.reversed()).thenComparing(LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT));
+//        System.out.println("After Sorting:" + nodes);
+        int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
+        int maxGenerations = schedulerSettings.getInt("MaxGenerations", 4);
+        int maxPopulation = schedulerSettings.getInt("MaxPopulation", 8);
+        if (maxNodes > 1) {
+            Node node = liveNodes.get(in.co.s13.sips.lib.node.settings.GlobalValues.NODE_UUID);
+            nodes.remove(node);
+        }
+        if (maxNodes < nodes.size()) {
+            // select best nodes for scheduling
+            nodes = new ArrayList<>(nodes.subList(0, maxNodes));
+        }
+        Collections.sort(nodes, LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.reversed());
+
+        Node bestNode = nodes.get(0);
+        double maxCPUScore = bestNode.getCPUScore();
+
+        int totalnodes = nodes.size();
+
+        /**
+         * * Calculate slots available****
+         */
+        int availSlots = nodes.get(0).getTask_limit() - nodes.get(0).getWaiting_in_que();
+        double minExpectedTime = 1;
+        ConcurrentHashMap<String, Processor> processors = new ConcurrentHashMap<>();
+        processors.put(nodes.get(0).getUuid(), new Processor(nodes.get(0).getUuid(), availSlots, nodes.get(0).getCPUScore(), new ArrayList<Task>(), new ArrayList<>(), nodes.get(0).getDistanceFromCurrent(), maxCPUScore / nodes.get(0).getCPUScore()));
+
+        for (int i = 1; i < nodes.size(); i++) {
+            Node get = nodes.get(i);
+            availSlots += (get.getTask_limit() - get.getWaiting_in_que());
+            int availSlotsOnNode = (get.getTask_limit() - get.getWaiting_in_que());
+            processors.put(get.getUuid(), new Processor(get.getUuid(), availSlotsOnNode, get.getCPUScore(), new ArrayList<Task>(), new ArrayList<>(), get.getDistanceFromCurrent(), maxCPUScore / get.getCPUScore()));
+            for (int j = 0; j < availSlotsOnNode; j++) {
+                minExpectedTime = ((minExpectedTime) * (maxCPUScore / get.getCPUScore())) / ((minExpectedTime) + (maxCPUScore / get.getCPUScore()));
+            }
+        }
+        if (availSlots < maxNodes) {
+            availSlots = maxNodes;
+        }
+
+        Chromosome resultant = new Chromosome();
+        ArrayList<ProcessorComparator> comparators = new ArrayList<>();
+        comparators.add(ProcessorComparator.AVAIL_SLOTS_SORT);
+        comparators.add(ProcessorComparator.CPU_SCORE_SORT);
+        comparators.add(ProcessorComparator.DISTANCE_SORT);
+        comparators.add(ProcessorComparator.PF_SORT);
+        ArrayList<Chromosome> chromosomes = new ArrayList<>();
+
+        for (int r = 0; r < maxPopulation; r++) {
+            System.out.println("Generating chromosome for " + r);
+
+            ArrayList<Task> elements = new ArrayList<>();
+            ArrayList<Processor> processorsForSelection = new ArrayList<>();
+            processors.values().forEach(value -> processorsForSelection.add(new Processor(value)));
+            ProcessorComparator randomComparator = comparators.get(randInt(0, comparators.size() - 1));
+            if (randomComparator == ProcessorComparator.DISTANCE_SORT || randomComparator == ProcessorComparator.PF_SORT) {
+                Collections.sort(processorsForSelection, randomComparator.reversed());
+            } else {
+                Collections.sort(processorsForSelection, randomComparator.reversed());
+            }
+            System.out.println("Sorted processors using " + randomComparator.name());
+            Chromosome chromosome = new Chromosome();
+            chromosome.getProcessors().addAll(processorsForSelection);
+            System.out.println("Added processors to Chromosome");
+            for (int j = 0; j < result.size(); j++) {
+                Processor randomlySelectedNode = getRandomProcessor(processorsForSelection, processors);
+
+            }
+            chromosome.getElements().addAll(elements);
+            chromosomes.add(chromosome);
+        }
+        this.totalChunks = resultant.getElements().size();
+        this.selectedNodes = (int) resultant.getProcessors().stream().filter(p -> p.getQue().size() > 0).count();
+        this.nodes = resultant.getProcessors().size();
+        backupNodes.addAll(nodes);
+        return resultant;
+    }
+
     public Chromosome getBestChromosome(ConcurrentHashMap<String, Node> liveNodes, ParallelForLoop loop, JSONObject schedulerSettings) {
         ArrayList<ParallelForSENP> result = new ArrayList<>();
         ArrayList<Node> nodes = new ArrayList<>();

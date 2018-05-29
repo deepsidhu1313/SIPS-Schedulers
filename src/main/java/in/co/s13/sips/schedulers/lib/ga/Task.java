@@ -17,6 +17,7 @@
 package in.co.s13.sips.schedulers.lib.ga;
 
 import in.co.s13.sips.lib.common.datastructure.ParallelForSENP;
+import in.co.s13.sips.lib.common.datastructure.SIPSTask;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -33,6 +34,7 @@ public class Task {
     private long exectime;
     private ArrayList<Task> deplist = new ArrayList<>();
     private ParallelForSENP parallelForLoop;
+    private SIPSTask sipsTask;
 
     public Task(String id, double value, long starttime, long endtime, long exectime, ArrayList<Task> deplist, double problemSize) {
         this.id = id;
@@ -110,6 +112,14 @@ public class Task {
         this.parallelForLoop = parallelForLoop;
     }
 
+    public SIPSTask getSipsTask() {
+        return sipsTask;
+    }
+
+    public void setSipsTask(SIPSTask sipsTask) {
+        this.sipsTask = sipsTask;
+    }
+
     public double getProblemSize() {
         return problemSize;
     }
@@ -117,12 +127,10 @@ public class Task {
     public void setProblemSize(double problemSize) {
         this.problemSize = problemSize;
     }
-    
-    
 
     @Override
     public String toString() {
-        return "Task{" + "id=" + id + ", value=" + value + ", starttime=" + starttime + ", endtime=" + endtime + ", exectime=" + exectime + ", deplist=" + deplist + ", parallelForLoop=" + parallelForLoop + '}';
+        return "Task{" + "id=" + id + ", value=" + value + ", starttime=" + starttime + ", endtime=" + endtime + ", exectime=" + exectime + ", deplist=" + deplist + '}';
     }
 
     public static enum TaskComparator implements Comparator<Task> {
