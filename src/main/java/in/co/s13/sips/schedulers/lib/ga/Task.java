@@ -128,10 +128,21 @@ public class Task {
         this.problemSize = problemSize;
     }
 
+    public String getNodeUUID() {
+        if (this.parallelForLoop != null) {
+            return this.parallelForLoop.getNodeUUID();
+        } else if (this.sipsTask != null) {
+            return this.sipsTask.getNodeUUID();
+        }
+        return "Empty";
+    }
+
     @Override
     public String toString() {
-        return "Task{" + "id=" + id + ", value=" + value + ", starttime=" + starttime + ", endtime=" + endtime + ", exectime=" + exectime + ", deplist=" + deplist + '}';
+        return "Task{" + "id=" + id + ", value=" + value + ", problemSize=" + problemSize + ", starttime=" + starttime + ", endtime=" + endtime + ", exectime=" + exectime + ", deplist=" + deplist + '}';
     }
+
+   
 
     public static enum TaskComparator implements Comparator<Task> {
 

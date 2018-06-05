@@ -36,6 +36,18 @@ public class GSS implements Scheduler {
 
     private int nodes, totalChunks, selectedNodes;
     private ArrayList<Node> backupNodes = new ArrayList<>();
+    private ArrayList<String> errors = new ArrayList<>();
+    private ArrayList<String> outputs = new ArrayList<>();
+
+    @Override
+    public ArrayList<String> getErrors() {
+        return errors;
+    }
+
+    @Override
+    public ArrayList<String> getOutputs() {
+        return outputs;
+    }
 
     @Override
     public int getSelectedNodes() {
@@ -53,10 +65,10 @@ public class GSS implements Scheduler {
         ArrayList<Node> nodes = new ArrayList<>();
         nodes.addAll(livenodes.values());
 
-        System.out.println("Before Sorting:" + nodes);
+        outputs.add("Before Sorting:" + nodes);
         // first sort score in decending order, then distance in ascending order
         Collections.sort(nodes, LiveNode.LiveNodeComparator.QWAIT.thenComparing(LiveNode.LiveNodeComparator.QLEN.reversed()).thenComparing(LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.reversed()).thenComparing(LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT));
-        System.out.println("After Sorting:" + nodes);
+        outputs.add("After Sorting:" + nodes);
         int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
         if (maxNodes > 1) {
             Node node = livenodes.get(in.co.s13.sips.lib.node.settings.GlobalValues.NODE_UUID);

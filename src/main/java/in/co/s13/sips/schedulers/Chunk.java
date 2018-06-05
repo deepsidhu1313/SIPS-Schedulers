@@ -31,11 +31,23 @@ public class Chunk implements Scheduler {
 
     private int nodes, totalChunks, selectedNodes;
     private ArrayList<Node> backupNodes = new ArrayList<>();
+    private ArrayList<String> errors = new ArrayList<>();
+    private ArrayList<String> outputs = new ArrayList<>();
+
+    @Override
+    public ArrayList<String> getErrors() {
+        return errors;
+    }
+
+    @Override
+    public ArrayList<String> getOutputs() {
+        return outputs;
+    }
 
     @Override
     public ArrayList<SIPSTask> schedule(ConcurrentHashMap<String, Node> livenodes, ConcurrentHashMap<String, SIPSTask> tasks, JSONObject schedulerSettings) {
         ArrayList<SIPSTask> result = new ArrayList<>();
-        System.out.println("Tasks: " + tasks.values());
+        outputs.add("Tasks: " + tasks.values());
         ArrayList<Node> nodes = new ArrayList<>();
         nodes.addAll(livenodes.values());
 
@@ -51,9 +63,9 @@ public class Chunk implements Scheduler {
             nodes = new ArrayList<>(nodes.subList(0, maxNodes));
         }
 
-        ArrayList<SIPSTask> tasksList =sortTasksAccordingToDependencies(tasks);
-//        System.out.println("UnSorted Tasks:" + tasksList);
-        System.out.println("Sorted Tasks:" + tasksList);
+        ArrayList<SIPSTask> tasksList = sortTasksAccordingToDependencies(tasks);
+//        outputs.add("UnSorted Tasks:" + tasksList);
+        outputs.add("Sorted Tasks:" + tasksList);
         int nodeCounter = 0;
         for (int i = 0; i < tasksList.size(); i++) {
             SIPSTask get = tasksList.get(i);
@@ -76,7 +88,7 @@ public class Chunk implements Scheduler {
 
     private ArrayList<SIPSTask> sortTasksAccordingToDependencies(ConcurrentHashMap<String, SIPSTask> tasks) {
         ArrayList<SIPSTask> tasksList = new ArrayList<>(tasks.values());
-        System.out.println("UnSorted Tasks:" + tasksList);
+        outputs.add("UnSorted Tasks:" + tasksList);
         Collections.sort(tasksList, SIPSTask.SIPSTaskComparator.NO_OF_DEPENDENCIES.thenComparing(SIPSTask.SIPSTaskComparator.ID));
         for (int i = 0; i < tasksList.size(); i++) {
             SIPSTask get = tasksList.get(i);
@@ -114,10 +126,10 @@ public class Chunk implements Scheduler {
         ArrayList<Node> nodes = new ArrayList<>();
         nodes.addAll(livenodes.values());
 
-        System.out.println("Before Sorting:" + nodes);
+        outputs.add("Before Sorting:" + nodes);
         // first sort score in decending order, then distance in ascending order
         Collections.sort(nodes, LiveNode.LiveNodeComparator.QWAIT.thenComparing(LiveNode.LiveNodeComparator.QLEN.reversed()).thenComparing(LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.reversed()).thenComparing(LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT));
-        System.out.println("After Sorting:" + nodes);
+        outputs.add("After Sorting:" + nodes);
         int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
 
         if (maxNodes > 1) {

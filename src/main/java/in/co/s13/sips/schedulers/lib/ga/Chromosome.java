@@ -77,6 +77,8 @@ public class Chromosome {
         }
     }
 
+    
+    
     public ConcurrentHashMap<String, Task> getElementsHM() {
         return elementsHM;
     }

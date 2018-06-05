@@ -130,7 +130,6 @@ public class Processor {
     public ArrayList<FreeSlot> getFreeSlots() {
         ArrayList<FreeSlot> result = new ArrayList<>();
         ArrayList<Task> queue = this.getQue();
-        System.out.println("Queue: " + queue);
         if (queue.size() > 1) {
             for (int i = 0; i < queue.size() - 1; i++) {
                 Task get = queue.get(i);
