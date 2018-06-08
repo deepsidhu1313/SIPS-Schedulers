@@ -29,12 +29,12 @@ public class Processor {
     private int availSlots;
     private double CPUScore;
     private double performanceFactor;
-    private ArrayList<Task> que;
-    private ArrayList<Task> depque;
+    private ArrayList<Task> que= new ArrayList<>();
+    private ArrayList<String> depque= new ArrayList<>();
     private long timeCounter = 0;
     private long distanceFromCurrent = 0;
 
-    public Processor(String id, int availSlots, double cpuScore, ArrayList<Task> que, ArrayList<Task> depque, long distanceFromCurrent, double performanceFactor) {
+    public Processor(String id, int availSlots, double cpuScore, ArrayList<Task> que, ArrayList<String> depque, long distanceFromCurrent, double performanceFactor) {
         this.id = id;
         this.availSlots = availSlots;
         this.CPUScore = cpuScore;
@@ -48,8 +48,14 @@ public class Processor {
         this.id = otherProcessor.id;
         this.availSlots = otherProcessor.availSlots;
         this.CPUScore = otherProcessor.CPUScore;
-        this.que = otherProcessor.que;
-        this.depque = otherProcessor.depque;
+        for (int i = 0; i < otherProcessor.que.size(); i++) {
+            Task get = otherProcessor.que.get(i);
+            this.que.add(get);
+        }
+        for (int i = 0; i < otherProcessor.depque.size(); i++) {
+            String get = otherProcessor.depque.get(i);
+            this.depque.add(get);
+        }
         this.distanceFromCurrent = otherProcessor.distanceFromCurrent;
         this.performanceFactor = otherProcessor.performanceFactor;
     }
@@ -78,11 +84,11 @@ public class Processor {
         this.que = value;
     }
 
-    public ArrayList<Task> getDepque() {
+    public ArrayList<String> getDepque() {
         return depque;
     }
 
-    public void setDepque(ArrayList<Task> value) {
+    public void setDepque(ArrayList<String> value) {
         this.depque = value;
     }
 

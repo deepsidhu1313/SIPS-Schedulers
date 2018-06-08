@@ -32,11 +32,11 @@ public class Task {
     private long starttime;
     private long endtime;
     private long exectime;
-    private ArrayList<Task> deplist = new ArrayList<>();
+    private ArrayList<String> deplist = new ArrayList<>();
     private ParallelForSENP parallelForLoop;
     private SIPSTask sipsTask;
 
-    public Task(String id, double value, long starttime, long endtime, long exectime, ArrayList<Task> deplist, double problemSize) {
+    public Task(String id, double value, long starttime, long endtime, long exectime, ArrayList<String> deplist, double problemSize) {
         this.id = id;
         this.value = value;
         this.starttime = starttime;
@@ -51,7 +51,7 @@ public class Task {
         this.value = otherTask.value;
         this.starttime = otherTask.starttime;
         this.endtime = otherTask.endtime;
-        this.deplist = otherTask.deplist;
+        this.deplist.addAll(otherTask.deplist);
         this.exectime = otherTask.exectime;
         this.problemSize = otherTask.problemSize;
     }
@@ -96,11 +96,11 @@ public class Task {
         this.exectime = value;
     }
 
-    public ArrayList<Task> getDeplist() {
+    public ArrayList<String> getDeplist() {
         return deplist;
     }
 
-    public void setDeplist(ArrayList<Task> value) {
+    public void setDeplist(ArrayList<String> value) {
         this.deplist = value;
     }
 
