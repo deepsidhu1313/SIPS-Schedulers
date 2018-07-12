@@ -238,17 +238,31 @@ public class GATDS implements Scheduler {
         }
         for (int i = 0; i < chromosome.getElements().size(); i++) {
             Task get = chromosome.getElements().get(i);
+            if (get.getParallelForLoop() != null && (get.getParallelForLoop().hasDuplicates() || get.getParallelForLoop().isDuplicate())) {
+                continue;
+            } else if (get.getSipsTask() != null && (get.getSipsTask().hasDuplicates() || get.getSipsTask().isDuplicate())) {
+                continue;
+            }
             for (int j = 0; j < get.getDeplist().size(); j++) {
                 outputs.add("Looking for duplicable dependency");
                 String dependencyTaskId = get.getDeplist().get(j);
                 Task dependencyTask = getDepTaskwMinEndtime(processors, dependencyTaskId);
                 if (dependencyTask != null) {
+                    if (dependencyTask.getParallelForLoop() != null && (dependencyTask.getParallelForLoop().hasDuplicates() || dependencyTask.getParallelForLoop().isDuplicate())) {
+                        continue;
+                    } else if (dependencyTask.getSipsTask() != null && (dependencyTask.getSipsTask().hasDuplicates() || dependencyTask.getSipsTask().isDuplicate())) {
+                        continue;
+                    }
                     long depEndTime = dependencyTask.getEndtime();
                     Collections.sort(processors, Processor.ProcessorComparator.FREE_SLOTS_SORT.reversed().thenComparing(Processor.ProcessorComparator.DISTANCE_SORT).thenComparing(Processor.ProcessorComparator.PF_SORT));
                     int k = 0;
-                    boolean eligible = false;
-                    while ((!eligible) && k < processors.size()) {
+                    boolean duplicated = false;
+                    while ((!duplicated) && k < processors.size()) {
                         Processor processor = processors.get(k);
+                        if (dependencyTask.getNodeUUID().equalsIgnoreCase(processor.getId())) {
+                            k++;
+                            continue;
+                        }
                         ArrayList<FreeSlot> freeSlots = processor.getFreeSlots();
                         for (int l = 0; l < freeSlots.size(); l++) {
                             FreeSlot freeSlot = freeSlots.get(l);
@@ -256,8 +270,7 @@ public class GATDS implements Scheduler {
                             if (freeSlot.getSize() >= estimateExcTime
                                     && freeSlot.getFrom() >= getMaxMinDepTime(processors, dependencyTask)
                                     && depEndTime >= freeSlot.getFrom() + estimateExcTime + (processor.getDistanceFromCurrent())
-                                    && dependencyTask.getExectime() >= estimateExcTime + (processor.getDistanceFromCurrent())
-                                    && !dependencyTask.getNodeUUID().equalsIgnoreCase(processor.getId())) {
+                                    && dependencyTask.getExectime() >= estimateExcTime + (processor.getDistanceFromCurrent())) {
                                 Task duplicate = new Task(dependencyTask.getId(), estimateExcTime, freeSlot.getFrom() + processor.getDistanceFromCurrent(), freeSlot.getFrom() + estimateExcTime, estimateExcTime, new ArrayList<String>(), dependencyTask.getProblemSize());// dependencyTask.getParallelForLoop()
                                 outputs.add("\tAlready Allocated to " + get.getNodeUUID() + " Now Allocating to " + processor.getId());
 
@@ -268,7 +281,7 @@ public class GATDS implements Scheduler {
                                     duplicateSENP.setDuplicateOf(dependencyTask.getParallelForLoop().getNodeUUID() + "-" + dependencyTask.getParallelForLoop().getChunkNo());
                                     duplicate.setParallelForLoop(duplicateSENP);
                                     processor.getQue().add(getTaskLocationInQueue(processor, freeSlot.getFrom()), duplicate);
-                                    eligible = true;
+                                    duplicated = true;
                                 } else if (dependencyTask.getSipsTask() != null) {
                                     SIPSTask duplicateTask = new SIPSTask(dependencyTask.getSipsTask());
                                     duplicateTask.setNodeUUID(processor.getId());
@@ -277,13 +290,13 @@ public class GATDS implements Scheduler {
                                     duplicateTask.setDuplicateOf(dependencyTask.getSipsTask().getNodeUUID() + "-" + dependencyTask.getSipsTask().getId());
                                     duplicate.setSipsTask(duplicateTask);
                                     processor.getQue().add(getTaskLocationInQueue(processor, freeSlot.getFrom()), duplicate);
-                                    eligible = true;
+                                    duplicated = true;
                                 }
                                 break;
                             }
                         }
 
-                        if (!eligible && processor.getTimeCounter() < maxTimeCounter && !get.getNodeUUID().equalsIgnoreCase(processor.getId())) {
+                        if (!duplicated && processor.getTimeCounter() < maxTimeCounter && !get.getNodeUUID().equalsIgnoreCase(processor.getId())) {
                             long estimateExcTime = (long) (dependencyTask.getProblemSize() * processor.getPerformanceFactor());
                             if (maxTimeCounter - processor.getTimeCounter() >= estimateExcTime
                                     && processor.getTimeCounter() >= getMaxMinDepTime(processors, dependencyTask)
@@ -298,7 +311,7 @@ public class GATDS implements Scheduler {
                                     duplicateSENP.setDuplicateOf(dependencyTask.getParallelForLoop().getNodeUUID() + "-" + dependencyTask.getParallelForLoop().getChunkNo());
                                     duplicate.setParallelForLoop(duplicateSENP);
                                     processor.getQue().add(getTaskLocationInQueue(processor, processor.getTimeCounter()), duplicate);
-                                    eligible = true;
+                                    duplicated = true;
                                 } else if (dependencyTask.getSipsTask() != null) {
                                     SIPSTask duplicateTask = new SIPSTask(dependencyTask.getSipsTask());
                                     duplicateTask.setNodeUUID(processor.getId());
@@ -307,7 +320,7 @@ public class GATDS implements Scheduler {
                                     duplicateTask.setDuplicateOf(dependencyTask.getSipsTask().getNodeUUID() + "-" + dependencyTask.getSipsTask().getId());
                                     duplicate.setSipsTask(duplicateTask);
                                     processor.getQue().add(getTaskLocationInQueue(processor, processor.getTimeCounter()), duplicate);
-                                    eligible = true;
+                                    duplicated = true;
                                 }
                             }
                         }
@@ -316,12 +329,16 @@ public class GATDS implements Scheduler {
                 }
             }
             int k = 0;
-            boolean eligible = false;
+            boolean duplicated = false;
             outputs.add("Looking for duplicable task " + get.getId());
 
-            while ((!eligible) && k < processors.size()) {
+            while ((!duplicated) && k < processors.size()) {
                 outputs.add("Checking out processor number " + k);
                 Processor processor = processors.get(k);
+                if (get.getNodeUUID().equalsIgnoreCase(processor.getId())) {
+                    k++;
+                    continue;
+                }
                 ArrayList<FreeSlot> freeSlots = processor.getFreeSlots();
 
                 for (int l = 0; l < freeSlots.size(); l++) {
@@ -331,8 +348,7 @@ public class GATDS implements Scheduler {
                     if (freeSlot.getSize() >= estimateExcTime
                             && freeSlot.getFrom() >= getMaxMinDepTime(processors, get)
                             && get.getEndtime() >= freeSlot.getFrom() + estimateExcTime + processor.getDistanceFromCurrent()
-                            && get.getExectime() >= estimateExcTime + processor.getDistanceFromCurrent()
-                            && !get.getNodeUUID().equalsIgnoreCase(processor.getId())) {
+                            && get.getExectime() >= estimateExcTime + processor.getDistanceFromCurrent()) {
                         outputs.add("Selected slot number " + l);
                         outputs.add("\tAlready Allocated to " + get.getNodeUUID() + " Now Allocating to " + processor.getId());
 
@@ -344,7 +360,7 @@ public class GATDS implements Scheduler {
                             duplicateSENP.setDuplicateOf(get.getParallelForLoop().getNodeUUID() + "-" + get.getParallelForLoop().getChunkNo());
                             duplicate.setParallelForLoop(duplicateSENP);
                             processor.getQue().add(getTaskLocationInQueue(processor, freeSlot.getFrom()), duplicate);
-                            eligible = true;
+                            duplicated = true;
                         } else if (get.getSipsTask() != null) {
                             SIPSTask duplicateTask = new SIPSTask(get.getSipsTask());
                             duplicateTask.setNodeUUID(processor.getId());
@@ -353,12 +369,12 @@ public class GATDS implements Scheduler {
                             duplicateTask.setDuplicateOf(get.getSipsTask().getNodeUUID() + "-" + get.getSipsTask().getId());
                             duplicate.setSipsTask(duplicateTask);
                             processor.getQue().add(getTaskLocationInQueue(processor, freeSlot.getFrom()), duplicate);
-                            eligible = true;
+                            duplicated = true;
                         }
                         break;
                     }
                 }
-                if (!eligible && processor.getTimeCounter() < maxTimeCounter && !get.getNodeUUID().equalsIgnoreCase(processor.getId())) {
+                if (!duplicated && processor.getTimeCounter() < maxTimeCounter && !get.getNodeUUID().equalsIgnoreCase(processor.getId())) {
                     long estimateExcTime = (long) (get.getProblemSize() * processor.getPerformanceFactor());
                     if (maxTimeCounter - processor.getTimeCounter() >= estimateExcTime
                             && processor.getTimeCounter() >= getMaxMinDepTime(processors, get)
@@ -373,7 +389,7 @@ public class GATDS implements Scheduler {
                             duplicateSENP.setDuplicateOf(get.getParallelForLoop().getNodeUUID() + "-" + get.getParallelForLoop().getChunkNo());
                             duplicate.setParallelForLoop(duplicateSENP);
                             processor.getQue().add(getTaskLocationInQueue(processor, processor.getTimeCounter()), duplicate);
-                            eligible = true;
+                            duplicated = true;
                         } else if (duplicate.getSipsTask() != null) {
                             SIPSTask duplicateTask = new SIPSTask(get.getSipsTask());
                             duplicateTask.setNodeUUID(processor.getId());
@@ -382,7 +398,7 @@ public class GATDS implements Scheduler {
                             duplicateTask.setDuplicateOf(get.getNodeUUID() + "-" + get.getSipsTask().getId());
                             duplicate.setSipsTask(duplicateTask);
                             processor.getQue().add(getTaskLocationInQueue(processor, processor.getTimeCounter()), duplicate);
-                            eligible = true;
+                            duplicated = true;
 
                         }
                     }
