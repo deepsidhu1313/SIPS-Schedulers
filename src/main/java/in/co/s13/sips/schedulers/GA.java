@@ -155,7 +155,7 @@ public class GA implements Scheduler {
         int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
         int maxGenerations = schedulerSettings.getInt("MaxGenerations", 4);
         int maxPopulation = schedulerSettings.getInt("MaxPopulation", 8);
-        if (maxNodes > 1) {
+        if (maxNodes > 1 && nodes.size() > 1) {
             Node node = liveNodes.get(in.co.s13.sips.lib.node.settings.GlobalValues.NODE_UUID);
             nodes.remove(node);
         }
@@ -344,7 +344,7 @@ public class GA implements Scheduler {
         int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
         int maxGenerations = schedulerSettings.getInt("MaxGenerations", 4);
         int maxPopulation = schedulerSettings.getInt("MaxPopulation", 8);
-        if (maxNodes > 1) {
+        if (maxNodes > 1 && nodes.size() > 1) {
             Node node = liveNodes.get(in.co.s13.sips.lib.node.settings.GlobalValues.NODE_UUID);
             nodes.remove(node);
         }

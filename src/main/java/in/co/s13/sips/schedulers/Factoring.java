@@ -71,7 +71,7 @@ public class Factoring implements Scheduler {
         Collections.sort(nodesList, LiveNode.LiveNodeComparator.QWAIT.thenComparing(LiveNode.LiveNodeComparator.QLEN.reversed()).thenComparing(LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.reversed()).thenComparing(LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT));
         outputs.add("After Sorting:" + nodesList);
         int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
-        if (maxNodes > 1) {
+        if (maxNodes > 1 && nodesList.size() > 1) {
             Node node = livenodes.get(in.co.s13.sips.lib.node.settings.GlobalValues.NODE_UUID);
             nodesList.remove(node);
         }

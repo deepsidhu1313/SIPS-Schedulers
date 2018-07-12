@@ -54,7 +54,7 @@ public class Chunk implements Scheduler {
         Collections.sort(nodes, LiveNode.LiveNodeComparator.QWAIT.thenComparing(LiveNode.LiveNodeComparator.QLEN.reversed()).thenComparing(LiveNode.LiveNodeComparator.CPU_COMPOSITE_SCORE.reversed()).thenComparing(LiveNode.LiveNodeComparator.DISTANCE_FROM_CURRENT));
         int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
 
-        if (maxNodes > 1) {
+        if (maxNodes > 1  && nodes.size() > 1) {
             Node node = livenodes.get(in.co.s13.sips.lib.node.settings.GlobalValues.NODE_UUID);
             nodes.remove(node);
         }
@@ -132,7 +132,7 @@ public class Chunk implements Scheduler {
         outputs.add("After Sorting:" + nodes);
         int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
 
-        if (maxNodes > 1) {
+        if (maxNodes > 1 && nodes.size() > 1) {
             Node node = livenodes.get(in.co.s13.sips.lib.node.settings.GlobalValues.NODE_UUID);
             nodes.remove(node);
         }
@@ -182,7 +182,6 @@ public class Chunk implements Scheduler {
                 break;
         }
         int totalnodes = nodes.size();
-
         for (int i = 1; i <= nodes.size(); i++) {
             Node get = nodes.get(i - 1);
             switch (loop.getDataType()) {

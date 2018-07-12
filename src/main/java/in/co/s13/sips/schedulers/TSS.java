@@ -67,7 +67,7 @@ public class TSS implements Scheduler {
         int maxNodes = schedulerSettings.getInt("MaxNodes", 4);
         double FCFactor = schedulerSettings.getDouble("FCFactor", 0.07);
         double LCFactor = schedulerSettings.getDouble("LCFactor", 0.004);
-        if (maxNodes > 1) {
+        if (maxNodes > 1  && nodes.size() > 1) {
             Node node = livenodes.get(in.co.s13.sips.lib.node.settings.GlobalValues.NODE_UUID);
             nodes.remove(node);
         }
