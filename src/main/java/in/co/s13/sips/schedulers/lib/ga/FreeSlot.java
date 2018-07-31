@@ -22,35 +22,35 @@ package in.co.s13.sips.schedulers.lib.ga;
  */
 public class FreeSlot {
 
-    long from, to, size;
+    Double from, to, size;
 
-    public FreeSlot(long from, long to, long size) {
+    public FreeSlot(Double from, Double to, Double size) {
         this.from = from;
         this.to = to;
         this.size = size;
     }
 
-    public long getFrom() {
+    public Double getFrom() {
         return from;
     }
 
-    public void setFrom(long from) {
+    public void setFrom(Double from) {
         this.from = from;
     }
 
-    public long getTo() {
+    public Double getTo() {
         return to;
     }
 
-    public void setTo(long to) {
+    public void setTo(Double to) {
         this.to = to;
     }
 
-    public long getSize() {
+    public Double getSize() {
         return size;
     }
 
-    public void setSize(long size) {
+    public void setSize(Double size) {
         this.size = size;
     }
 

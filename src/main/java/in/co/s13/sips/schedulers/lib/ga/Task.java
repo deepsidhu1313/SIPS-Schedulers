@@ -29,14 +29,16 @@ public class Task {
 
     private String id;
     private double value, problemSize;
-    private long starttime;
-    private long endtime;
-    private long exectime;
+    private Double starttime;
+    private Double endtime;
+    private Double exectime;
     private ArrayList<String> deplist = new ArrayList<>();
+    private ArrayList<String> resources = new ArrayList<>();
     private ParallelForSENP parallelForLoop;
     private SIPSTask sipsTask;
 
-    public Task(String id, double value, long starttime, long endtime, long exectime, ArrayList<String> deplist, double problemSize) {
+    public Task(String id, double value, Double starttime, Double endtime, Double exectime, ArrayList<String> deplist, double problemSize, ArrayList<String> resources
+    ) {
         this.id = id;
         this.value = value;
         this.starttime = starttime;
@@ -44,6 +46,7 @@ public class Task {
         this.deplist = deplist;
         this.exectime = exectime;
         this.problemSize = problemSize;
+        this.resources = resources;
     }
 
     public Task(Task otherTask) {
@@ -54,6 +57,7 @@ public class Task {
         this.deplist.addAll(otherTask.deplist);
         this.exectime = otherTask.exectime;
         this.problemSize = otherTask.problemSize;
+        this.resources = otherTask.resources;
     }
 
     public String getId() {
@@ -72,27 +76,27 @@ public class Task {
         this.value = value;
     }
 
-    public long getStarttime() {
+    public Double getStarttime() {
         return starttime;
     }
 
-    public void setStarttime(long value) {
+    public void setStarttime(Double value) {
         this.starttime = value;
     }
 
-    public long getEndtime() {
+    public Double getEndtime() {
         return endtime;
     }
 
-    public void setEndtime(long value) {
+    public void setEndtime(Double value) {
         this.endtime = value;
     }
 
-    public long getExectime() {
+    public Double getExectime() {
         return exectime;
     }
 
-    public void setExectime(long value) {
+    public void setExectime(Double value) {
         this.exectime = value;
     }
 
@@ -137,12 +141,18 @@ public class Task {
         return "Empty";
     }
 
-    @Override
-    public String toString() {
-        return "Task{" + "id=" + id + ", value=" + value + ", problemSize=" + problemSize + ", starttime=" + starttime + ", endtime=" + endtime + ", exectime=" + exectime + ", deplist=" + deplist + '}';
+    public ArrayList<String> getResources() {
+        return resources;
     }
 
-   
+    public void setResources(ArrayList<String> resources) {
+        this.resources = resources;
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" + "id=" + id + ", value=" + value + ", problemSize=" + problemSize + ", starttime=" + starttime + ", endtime=" + endtime + ", exectime=" + exectime + ", deplist=" + deplist + ", resources=" + resources + '}';
+    }
 
     public static enum TaskComparator implements Comparator<Task> {
 
@@ -154,17 +164,17 @@ public class Task {
         }, START_TIME_SORT {
             @Override
             public int compare(Task o1, Task o2) {
-                return Long.valueOf(o1.getStarttime()).compareTo(o2.getStarttime());
+                return Double.valueOf(o1.getStarttime()).compareTo(o2.getStarttime());
             }
         }, END_TIME_SORT {
             @Override
             public int compare(Task o1, Task o2) {
-                return Long.valueOf(o1.getEndtime()).compareTo(o2.getEndtime());
+                return Double.valueOf(o1.getEndtime()).compareTo(o2.getEndtime());
             }
         }, EXC_TIME_SORT {
             @Override
             public int compare(Task o1, Task o2) {
-                return Long.valueOf(o1.getExectime()).compareTo(o2.getExectime());
+                return Double.valueOf(o1.getExectime()).compareTo(o2.getExectime());
             }
         },
         DEP_LIST_SIZE_SORT {

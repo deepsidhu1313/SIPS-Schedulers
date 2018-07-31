@@ -31,10 +31,10 @@ public class Processor {
     private double performanceFactor;
     private ArrayList<Task> que= new ArrayList<>();
     private ArrayList<String> depque= new ArrayList<>();
-    private long timeCounter = 0;
-    private long distanceFromCurrent = 0;
+    private Double timeCounter = 0.0;
+    private Double distanceFromCurrent = 0.0;
 
-    public Processor(String id, int availSlots, double cpuScore, ArrayList<Task> que, ArrayList<String> depque, long distanceFromCurrent, double performanceFactor) {
+    public Processor(String id, int availSlots, double cpuScore, ArrayList<Task> que, ArrayList<String> depque, Double distanceFromCurrent, double performanceFactor) {
         this.id = id;
         this.availSlots = availSlots;
         this.CPUScore = cpuScore;
@@ -100,23 +100,23 @@ public class Processor {
         this.CPUScore = CPUScore;
     }
 
-    public long getTimeCounter() {
+    public Double getTimeCounter() {
         return timeCounter;
     }
 
-    public long incrementTimeCounter(long delta) {
+    public Double incrementTimeCounter(Double delta) {
         return timeCounter += delta;
     }
 
-    public void setTimeCounter(long timeCounter) {
+    public void setTimeCounter(Double timeCounter) {
         this.timeCounter = timeCounter;
     }
 
-    public long getDistanceFromCurrent() {
+    public Double getDistanceFromCurrent() {
         return distanceFromCurrent;
     }
 
-    public void setDistanceFromCurrent(long distanceFromCurrent) {
+    public void setDistanceFromCurrent(Double distanceFromCurrent) {
         this.distanceFromCurrent = distanceFromCurrent;
     }
 
@@ -140,19 +140,19 @@ public class Processor {
             for (int i = 0; i < queue.size() - 1; i++) {
                 Task get = queue.get(i);
                 Task get1 = queue.get(i + 1);
-                long diff = get1.getStarttime() - get.getEndtime();
+                Double diff = get1.getStarttime() - get.getEndtime();
                 if (diff > 0) {
                     result.add(new FreeSlot(get.getEndtime(), get1.getStarttime(), diff));
                 }
             }
         } else if (queue.size() == 1) {
             Task get = queue.get(0);
-            long freeSlot = get.getStarttime() - 0;
+            Double freeSlot = get.getStarttime() - 0;
             if (freeSlot > 0) {
-                result.add(new FreeSlot(0, get.getStarttime(), freeSlot));
+                result.add(new FreeSlot(0.0, get.getStarttime(), freeSlot));
             }
         } else if (queue.isEmpty()) {
-            result.add(new FreeSlot(0, Long.MAX_VALUE, Long.MAX_VALUE));
+            result.add(new FreeSlot(0.0, Double.MAX_VALUE, Double.MAX_VALUE));
         }
         return result;
     }
@@ -167,7 +167,7 @@ public class Processor {
         }, DISTANCE_SORT {
             @Override
             public int compare(Processor o1, Processor o2) {
-                return Long.valueOf(o1.getDistanceFromCurrent()).compareTo(o2.getDistanceFromCurrent());
+                return Double.valueOf(o1.getDistanceFromCurrent()).compareTo(o2.getDistanceFromCurrent());
             }
         }, AVAIL_SLOTS_SORT {
             @Override
@@ -177,7 +177,7 @@ public class Processor {
         }, TIME_COUNTER_SORT {
             @Override
             public int compare(Processor o1, Processor o2) {
-                return Long.valueOf(o1.getTimeCounter()).compareTo(o2.getTimeCounter());
+                return Double.valueOf(o1.getTimeCounter()).compareTo(o2.getTimeCounter());
             }
         }, QUEUE_SIZE_SORT {
             @Override
