@@ -26,7 +26,7 @@ jobs:
         # build cannot resolve them from central. Tags are pinned so a run is
         # reproducible rather than depending on what a branch holds today.
         run: |
-          for pair in "common-json:v1.1.0" "common-sqlitejdbc:v1.1.0" "SIPS-lib:v1.2.1"; do
+          for pair in "common-json:v1.1.0" "common-sqlitejdbc:v1.1.0" "SIPS-lib:v1.2.2"; do
             repo="${pair%%:*}"
             tag="${pair##*:}"
             git clone --depth 1 --branch "$tag" \
